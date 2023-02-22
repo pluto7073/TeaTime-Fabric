@@ -1,0 +1,8 @@
+{
+  "type": "teatime:steaming",
+  "ingredient": {
+    "item": "teatime:tea_leaves"
+  },
+  "result": "teatime:steamed_tea_leaves",
+  "steamtime": 1200
+}

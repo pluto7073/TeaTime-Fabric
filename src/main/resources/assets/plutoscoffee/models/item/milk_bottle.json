@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "plutoscoffee:items/milk_bottle"
+  }
+}

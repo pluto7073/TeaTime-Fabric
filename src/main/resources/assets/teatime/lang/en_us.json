@@ -1,0 +1,23 @@
+{
+  "item.teatime.tea_seeds": "Tea Seeds",
+  "item.teatime.tea_leaves": "Tea Leaves",
+  "item.teatime.steamed_tea_leaves": "Steamed Tea Leaves",
+  "item.teatime.rolled_tea_leaves": "Rolled Tea Leaves",
+  "item.teatime.dried_tea_leaves": "Dried Green Tea Leaves",
+  "item.teatime.fermented_tea_leaves": "Fermented Tea Leaves",
+  "item.teatime.tea_bag": "Tea Bag",
+  "block.teatime.tea_shrub": "Tea Shrub",
+  "block.teatime.steamer": "Steamer",
+  "plutosmods.version.header.teatime": "Tea Time is Out of Date",
+  "plutosmods.version.message": "Please download the new version from Curseforge or Github!",
+  "plutosmods.version.okay": "Okay",
+  "plutosmods.version.open_mod_page": "Open Mod Page",
+  "itemGroup.teatime.tt_group": "Tea Time Items",
+  "container.steamer": "Steamer",
+  "rolled_will_create.teatime.title": "Will Create When Dried",
+  "rolled_will_create.teatime.steamed": "1 x Dried Green Tea Leaves",
+  "rolled_will_create.teatime.fresh": "1 x Fermented Tea Leaves",
+  "teatype.teatime.empty": "No Tea Type",
+  "teatype.teatime.green_tea": "Green Tea",
+  "teatype.teatime.black_tea": "Black Tea"
+}
