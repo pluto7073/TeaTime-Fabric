@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "teatime:withered_tea_leaves"
+  },
+  "result": "teatime:white_tea_leaves",
+  "cookingtime": 200
+}

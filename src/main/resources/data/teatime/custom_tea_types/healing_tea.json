@@ -1,0 +1,10 @@
+{
+  "parent": "teatime:herbal_tea",
+  "ingredients": [
+    "minecraft:glistering_melon_slice"
+  ],
+  "effects": [
+    "minecraft:regeneration"
+  ],
+  "color": 13719422
+}

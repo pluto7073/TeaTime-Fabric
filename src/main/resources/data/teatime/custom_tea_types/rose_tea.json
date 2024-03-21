@@ -1,0 +1,9 @@
+{
+  "parent": "teatime:herbal_tea",
+  "ingredients": [
+    "minecraft:rose_bush"
+  ],
+  "effects": [
+    "minecraft:instant_health"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ml.pluto7073.teatime.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractDecorationEntityMixin",
+    "AbstractFurnaceEntityMixin",
+    "ComposterBlockMixin",
+    "EntityMixin",
+    "ItemFrameEntityAccessor",
+    "ItemFrameEntityMixin",
+    "MerchantEntityMixin",
+    "VillagerEntityMixin"
+  ],
+  "client": [
+    "client.HandledScreensMixin",
+    "client.ItemColorsMixin",
+    "client.ResourceReloadLoggerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

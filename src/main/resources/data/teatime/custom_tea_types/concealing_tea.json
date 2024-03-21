@@ -1,0 +1,11 @@
+{
+  "parent": "teatime:black_tea",
+  "ingredients": [
+    "minecraft:golden_carrot",
+    "minecraft:fermented_spider_eye"
+  ],
+  "effects": [
+    "minecraft:invisibility"
+  ],
+  "color": 13195217
+}

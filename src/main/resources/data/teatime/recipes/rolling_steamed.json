@@ -1,0 +1,11 @@
+{
+  "type": "teatime:rolling",
+  "starting": {
+    "item": "teatime:steamed_tea_leaves"
+  },
+  "ending": {
+    "item": "teatime:rolled_tea_leaves",
+    "mod": "teatime:steamed"
+  },
+  "chance": 0.25
+}

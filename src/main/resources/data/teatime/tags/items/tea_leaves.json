@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "teatime:tea_leaves",
+    "teatime:steamed_tea_leaves",
+    "teatime:rolled_tea_leaves",
+    "teatime:dried_tea_leaves",
+    "teatime:fermented_tea_leaves"
+  ]
+}

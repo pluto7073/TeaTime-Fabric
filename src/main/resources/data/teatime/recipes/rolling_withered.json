@@ -1,0 +1,11 @@
+{
+  "type": "teatime:rolling",
+  "starting": {
+    "item": "teatime:withered_tea_leaves"
+  },
+  "ending": {
+    "item": "teatime:rolled_tea_leaves",
+    "mod": "teatime:withered"
+  },
+  "chance": 0.125
+}

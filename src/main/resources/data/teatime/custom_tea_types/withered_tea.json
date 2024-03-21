@@ -1,0 +1,15 @@
+{
+  "parent": "teatime:black_tea",
+  "ingredients": [
+    "minecraft:wither_rose"
+  ],
+  "effects": [
+    "minecraft:wither",
+    "minecraft:hunger",
+    "minecraft:nausea",
+    "minecraft:unluck",
+    "minecraft:slowness",
+    "minecraft:weakness"
+  ],
+  "color": 460551
+}

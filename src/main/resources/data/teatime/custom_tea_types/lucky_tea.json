@@ -1,0 +1,10 @@
+{
+  "parent": "teatime:green_tea",
+  "ingredients": [
+    "minecraft:rabbit_foot"
+  ],
+  "effects": [
+    "minecraft:luck"
+  ],
+  "color": 2973733
+}

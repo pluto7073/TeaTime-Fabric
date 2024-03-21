@@ -1,0 +1,9 @@
+{
+  "parent": "teatime:white_tea",
+  "ingredients": [
+    "minecraft:phantom_membrane"
+  ],
+  "effects": [
+    "minecraft:levitation"
+  ]
+}
