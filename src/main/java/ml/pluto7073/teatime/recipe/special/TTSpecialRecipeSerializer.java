@@ -1,15 +1,12 @@
 package ml.pluto7073.teatime.recipe.special;
 
 import com.google.gson.JsonObject;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.AbstractCookingRecipe;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.recipe.book.CookingRecipeCategory;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CookingBookCategory;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class TTSpecialRecipeSerializer <T extends AbstractCookingRecipe> implements RecipeSerializer<T> {
 
@@ -19,23 +16,23 @@ public class TTSpecialRecipeSerializer <T extends AbstractCookingRecipe> impleme
         this.factory = factory;
     }
 
-    public T read(Identifier identifier, JsonObject jsonObject) {
-        CookingRecipeCategory craftingRecipeCategory = CookingRecipeCategory.CODEC.byId(JsonHelper.getString(jsonObject, "category", null), CookingRecipeCategory.MISC);
+    public T fromJson(ResourceLocation identifier, JsonObject jsonObject) {
+        CookingBookCategory craftingRecipeCategory = CookingBookCategory.CODEC.byName(GsonHelper.getAsString(jsonObject, "category", null), CookingBookCategory.MISC);
         return this.factory.create(identifier, craftingRecipeCategory);
     }
 
-    public T read(Identifier identifier, PacketByteBuf packetByteBuf) {
-        CookingRecipeCategory craftingRecipeCategory = packetByteBuf.readEnumConstant(CookingRecipeCategory.class);
+    public T fromNetwork(ResourceLocation identifier, FriendlyByteBuf packetByteBuf) {
+        CookingBookCategory craftingRecipeCategory = packetByteBuf.readEnum(CookingBookCategory.class);
         return this.factory.create(identifier, craftingRecipeCategory);
     }
 
-    public void write(PacketByteBuf packetByteBuf, T craftingRecipe) {
-        packetByteBuf.writeEnumConstant(craftingRecipe.getCategory());
+    public void toNetwork(FriendlyByteBuf packetByteBuf, T craftingRecipe) {
+        packetByteBuf.writeEnum(craftingRecipe.category());
     }
 
     @FunctionalInterface
     public interface Factory<T extends AbstractCookingRecipe> {
-        T create(Identifier id, CookingRecipeCategory category);
+        T create(ResourceLocation id, CookingBookCategory category);
     }
 
 }

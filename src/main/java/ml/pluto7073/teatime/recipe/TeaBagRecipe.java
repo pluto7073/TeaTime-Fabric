@@ -6,31 +6,32 @@ import ml.pluto7073.teatime.tags.ModItemTags;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypes;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeaBagRecipe extends SpecialCraftingRecipe {
+@MethodsReturnNonnullByDefault
+public class TeaBagRecipe extends CustomRecipe {
 
-    public TeaBagRecipe(Identifier id, CraftingRecipeCategory category) {
+    public TeaBagRecipe(ResourceLocation id, CraftingBookCategory category) {
         super(id, category);
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
-        List<Item> items = getItems(inventory);
+    public boolean matches(CraftingContainer container, Level level) {
+        List<Item> items = getItems(container);
         if (!items.contains(Items.STRING) || !items.contains(Items.PAPER)) return false;
         items.remove(Items.PAPER);
         items.remove(Items.STRING);
@@ -38,20 +39,20 @@ public class TeaBagRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager manager) {
-        List<Item> ingredients = getItems(inventory);
+    public ItemStack assemble(CraftingContainer container, RegistryAccess manager) {
+        List<Item> ingredients = getItems(container);
         ingredients.remove(Items.PAPER);
         ingredients.remove(Items.STRING);
         ItemStack teaBag = new ItemStack(ModItems.TEA_BAG, 1);
         TeaType teaType = TeaTypes.getFromIngredients(ingredients);
         if (teaType == TeaTypes.EMPTY) {
-            throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(Registries.ITEM::getId).toList());
+            throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(BuiltInRegistries.ITEM::getId).toList());
         }
         return TeaTimeUtils.setTeaType(teaBag, teaType);
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return (width >= 1 && height >= 3) || (width >= 3 && height >= 1);
     }
 
@@ -60,11 +61,11 @@ public class TeaBagRecipe extends SpecialCraftingRecipe {
         return ModRecipes.TEA_BAG_MAKING;
     }
 
-    public static List<Item> getItems(RecipeInputInventory inventory) {
+    public static List<Item> getItems(CraftingContainer container) {
         ArrayList<Item> list = new ArrayList<>();
-        for (int i = 0; i < inventory.size(); i++) {
-            ItemStack stack = inventory.getStack(i);
-            if (stack.isEmpty() || stack.isOf(Items.AIR)) continue;
+        for (int i = 0; i < container.getContainerSize(); i++) {
+            ItemStack stack = container.getItem(i);
+            if (stack.isEmpty() || stack.is(Items.AIR)) continue;
             list.add(stack.getItem());
         }
         return list;

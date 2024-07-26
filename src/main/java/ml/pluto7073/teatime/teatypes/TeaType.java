@@ -2,14 +2,9 @@ package ml.pluto7073.teatime.teatypes;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import ml.pluto7073.teatime.TeaTime;
-import ml.pluto7073.teatime.item.ModItems;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.Item;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,18 +12,20 @@ import java.util.Map;
 
 public class TeaType {
 
-    public static final Map<Identifier, TeaType> TYPES = new HashMap<>();
+    public static final Map<ResourceLocation, TeaType> TYPES = new HashMap<>();
 
+    final ResourceLocation id;
     private final List<Item> ingredients;
     private final int colour;
     private final int caffeine;
-    private final StatusEffectInstance[] effects;
+    private final MobEffectInstance[] effects;
 
-    public TeaType(int colour, List<Item> ingredients, int caffeine, StatusEffectInstance... effects) {
+    public TeaType(ResourceLocation id, int colour, List<Item> ingredients, int caffeine, MobEffectInstance... effects) {
         this.colour = colour;
         this.ingredients = ingredients;
         this.effects = effects;
         this.caffeine = caffeine;
+        this.id = id;
     }
 
     public List<Item> getIngredients() {
@@ -40,7 +37,7 @@ public class TeaType {
     }
 
     public String getTranslationKey() {
-        Identifier id = TeaTypes.getId(this);
+        ResourceLocation id = TeaTypes.getId(this);
         return "teatype." + id.getNamespace() + "." + id.getPath();
     }
 
@@ -48,7 +45,7 @@ public class TeaType {
         return this.caffeine;
     }
 
-    public StatusEffectInstance[] getEffects() {
+    public MobEffectInstance[] getEffects() {
         return effects;
     }
 
@@ -59,4 +56,14 @@ public class TeaType {
         return object;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TeaType type)) return false;
+
+        if (type == this) return true;
+
+        if (type.hashCode() == this.hashCode()) return true;
+
+        return this.id == type.id;
+    }
 }

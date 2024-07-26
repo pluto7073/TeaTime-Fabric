@@ -1,34 +1,40 @@
 package ml.pluto7073.teatime;
 
+import com.google.gson.JsonObject;
+import ml.pluto7073.pdapi.addition.OnDrink;
+import ml.pluto7073.pdapi.addition.OnDrinkTemplate;
 import ml.pluto7073.pdapi.item.PDItems;
 import ml.pluto7073.teatime.block.ModBlocks;
 import ml.pluto7073.teatime.block.entity.ModBlockEntityTypes;
 import ml.pluto7073.teatime.entity.TTTrackedData;
 import ml.pluto7073.teatime.event.CustomTeaTypesRegisterer;
 import ml.pluto7073.teatime.event.ModEvents;
-import ml.pluto7073.teatime.gui.handlers.ModScreenHandlerTypes;
+import ml.pluto7073.teatime.gui.handlers.TTMenuTypes;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.recipe.ModRecipes;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypes;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
-import ml.pluto7073.teatime.utils.VersionChecker;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,12 +42,28 @@ public class TeaTime implements ModInitializer {
 
     public static final String MOD_ID = "teatime";
     public static final Logger logger = LogManager.getLogger("TeaTime");
-    public static final int MOD_VERSION = 0;
-    public static RegistryKey<ItemGroup> TT_GROUP;
+    public static ResourceKey<CreativeModeTab> TT_GROUP;
     public static boolean PLUTOSCOFFEEMOD_LOADED = false;
+    public static OnDrinkTemplate ADD_TEA_EFFECTS = (id, onDrinkData) -> {
+        ResourceLocation teaId = new ResourceLocation(GsonHelper.getAsString(onDrinkData, "tea"));
+        return new OnDrink() {
+            @Override
+            public void onDrink(ItemStack stack, Level level, LivingEntity user) {
+                TeaType type = TeaTypes.get(teaId);
+                for (MobEffectInstance e : type.getEffects()) {
+                    user.addEffect(e);
+                }
+                if (user instanceof Player player) player.awardStat(TTStats.DRINK_TEA);
+            }
+
+            @Override
+            public JsonObject toJson() {
+                return onDrinkData;
+            }
+        };
+    };
 
     private static TeaTime INSTANCE;
-    private static boolean loadLaterDone = false;
 
     @Override
     public void onInitialize() {
@@ -55,30 +77,31 @@ public class TeaTime implements ModInitializer {
         TeaTypes.init();
         TTStats.init();
         TTTrackedData.init();
+        OnDrinkTemplate.register(asId("add_tea_effects"), ADD_TEA_EFFECTS);
         createItemGroup();
         registerResourceReloadListener();
         ModEvents.init();
-        ModScreenHandlerTypes.init();
+        TTMenuTypes.init();
     }
 
     public static void createItemGroup() {
-        TT_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, asId("tt_group"));
-        Registry.register(Registries.ITEM_GROUP, TT_GROUP, FabricItemGroup.builder()
-                .icon(() -> new ItemStack(ModItems.TEA_LEAVES)).displayName(Text.translatable("itemGroup.teatime.tt_group")).build());
+        TT_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, asId("tt_group"));
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TT_GROUP, FabricItemGroup.builder()
+                .icon(() -> new ItemStack(ModItems.TEA_LEAVES)).title(Component.translatable("itemGroup.teatime.tt_group")).build());
         ItemGroupEvents.modifyEntriesEvent(TT_GROUP).register(stacks -> {
-                    stacks.add(new ItemStack(ModItems.STEAMER));
-                    stacks.add(new ItemStack(ModItems.TEA_SEEDS));
-                    stacks.add(new ItemStack(ModItems.TEA_LEAVES));
-                    stacks.add(new ItemStack(ModItems.WITHERED_TEA_LEAVES));
-                    stacks.add(new ItemStack(ModItems.WHITE_TEA_LEAVES));
-                    stacks.add(new ItemStack(ModItems.STEAMED_TEA_LEAVES));
-                    stacks.addAll(TeaTimeUtils.getRolledLeaves());
-                    stacks.add(new ItemStack(ModItems.DRIED_TEA_LEAVES));
-                    stacks.add(new ItemStack(ModItems.FERMENTED_TEA_LEAVES));
-                    stacks.addAll(TeaTimeUtils.getTeaBags());
-                    stacks.addAll(TeaTimeUtils.getTea());
-                    stacks.add(PDItems.MILK_BOTTLE);
-                    stacks.add(PDItems.DRINK_WORKSTATION);
+                    stacks.accept(new ItemStack(ModItems.STEAMER));
+                    stacks.accept(new ItemStack(ModItems.TEA_SEEDS));
+                    stacks.accept(new ItemStack(ModItems.TEA_LEAVES));
+                    stacks.accept(new ItemStack(ModItems.WITHERED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(ModItems.WHITE_TEA_LEAVES));
+                    stacks.accept(new ItemStack(ModItems.STEAMED_TEA_LEAVES));
+                    stacks.acceptAll(TeaTimeUtils.getRolledLeaves());
+                    stacks.accept(new ItemStack(ModItems.DRIED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(ModItems.FERMENTED_TEA_LEAVES));
+                    stacks.acceptAll(TeaTimeUtils.getTeaBags());
+                    stacks.acceptAll(TeaTimeUtils.getTea());
+                    stacks.accept(PDItems.MILK_BOTTLE);
+                    stacks.accept(PDItems.DRINK_WORKSTATION);
                 });
     }
 
@@ -87,12 +110,11 @@ public class TeaTime implements ModInitializer {
     }
 
     public static void registerResourceReloadListener() {
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new ModServerResourceManager());
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new CustomTeaTypesRegisterer());
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new CustomTeaTypesRegisterer());
     }
 
-    public static Identifier asId(String name) {
-        return new Identifier(MOD_ID, name);
+    public static ResourceLocation asId(String name) {
+        return new ResourceLocation(MOD_ID, name);
     }
 
 }

@@ -1,14 +1,15 @@
 package ml.pluto7073.teatime.recipe;
 
 import ml.pluto7073.teatime.TeaTime;
+import ml.pluto7073.teatime.recipe.special.SpecialAdditionSerializer;
 import ml.pluto7073.teatime.recipe.special.TTSpecialRecipeSerializer;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 
 public class ModRecipes {
 
@@ -18,22 +19,23 @@ public class ModRecipes {
     //Serializers
     public static final RecipeSerializer<SteamerRecipe> STEAMING_SERIALIZER;
     public static final RecipeSerializer<RollingRecipe> ROLLING_SERIALIZER;
-    public static final SpecialRecipeSerializer<TeaBagRecipe> TEA_BAG_MAKING;
-    public static final SpecialRecipeSerializer<TeaRecipe> TEA_BREWING;
+    public static final SimpleCraftingRecipeSerializer<TeaBagRecipe> TEA_BAG_MAKING;
+    public static final SimpleCraftingRecipeSerializer<TeaRecipe> TEA_BREWING;
     public static final TTSpecialRecipeSerializer<DriedTeaLeaves> DRIED_TEA_LEAVES;
     public static final TTSpecialRecipeSerializer<DriedTeaLeavesBlasting> DRIED_TEA_LEAVES_BLASTING;
+    public static final SpecialAdditionSerializer<TeaInLatteAdditionRecipe> TEA_IN_LATTE;
 
     private static <T extends Recipe<?>> RecipeType<T> register(final String id) {
-        return Registry.register(Registries.RECIPE_TYPE, new Identifier(TeaTime.MOD_ID, id), new RecipeType<T>() {
+        return Registry.register(BuiltInRegistries.RECIPE_TYPE, new ResourceLocation(TeaTime.MOD_ID, id), new RecipeType<T>() {
             @Override
             public String toString() {
-                return new Identifier(TeaTime.MOD_ID, id).toString();
+                return new ResourceLocation(TeaTime.MOD_ID, id).toString();
             }
         });
     }
 
     private static <S extends RecipeSerializer<T>, T extends Recipe<?>> S register(String id, S serializer) {
-        return Registry.register(Registries.RECIPE_SERIALIZER, new Identifier(TeaTime.MOD_ID, id), serializer);
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(TeaTime.MOD_ID, id), serializer);
     }
 
     static {
@@ -43,10 +45,11 @@ public class ModRecipes {
         //Serializers
         STEAMING_SERIALIZER = register("steaming", new SteamerRecipe.Serializer(1200));
         ROLLING_SERIALIZER = register("rolling", new RollingRecipe.Serializer(1.0));
-        TEA_BAG_MAKING = register("crafting_special_teabagmaking", new SpecialRecipeSerializer<>(TeaBagRecipe::new));
-        TEA_BREWING = register("crafting_special_teabrewing", new SpecialRecipeSerializer<>(TeaRecipe::new));
+        TEA_BAG_MAKING = register("crafting_special_teabagmaking", new SimpleCraftingRecipeSerializer<>(TeaBagRecipe::new));
+        TEA_BREWING = register("crafting_special_teabrewing", new SimpleCraftingRecipeSerializer<>(TeaRecipe::new));
         DRIED_TEA_LEAVES = register("smelting_special_driedtealeaves", new TTSpecialRecipeSerializer<>(DriedTeaLeaves::new));
         DRIED_TEA_LEAVES_BLASTING = register("blasting_special_driedtealeaves", new TTSpecialRecipeSerializer<>(DriedTeaLeavesBlasting::new));
+        TEA_IN_LATTE = register("drink_workstation_special_teainlatte", new SpecialAdditionSerializer<>(TeaInLatteAdditionRecipe::new));
     }
 
     public static void init() {}

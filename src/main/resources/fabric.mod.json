@@ -4,16 +4,16 @@
   "version": "${version}",
 
   "name": "Tea Time",
-  "description": "This mod adds tea to Minecraft! It also shares a lot with Pluto's Coffee Mod",
+  "description": "Spill that tea sis",
   "authors": [
     "Pluto7073"
   ],
   "contact": {
-    "homepage": "https://github.com/pluto7073/TeaTime-Fabric",
+    "homepage": "https://modrinth.com/mod/teatime",
     "sources": "https://github.com/pluto7073/TeaTime-Fabric"
   },
 
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/teatime/icon.png",
 
   "environment": "*",
@@ -46,7 +46,7 @@
     "fabric-api": "*",
     "minecraft": "~1.20.1",
     "java": ">=17",
-    "pdapi": ">=0.1.3"
+    "pdapi": ">=0.1.6"
   },
   "suggests": {
     "another-mod": "*"

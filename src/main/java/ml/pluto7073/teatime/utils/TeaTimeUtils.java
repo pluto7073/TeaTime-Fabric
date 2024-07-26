@@ -6,11 +6,10 @@ import ml.pluto7073.pdapi.addition.DrinkAdditions;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,80 +19,73 @@ import java.util.function.Supplier;
 
 public final class TeaTimeUtils {
 
-    public static Map<Vec3d, LeafDryerManager> TEA_LEAF_AGE_MAP = new HashMap<>();
     public static final Map<String, Item> DRYING_RESULTS = new HashMap<>();
     public static final int MAX_TIME_DRYING = 200;
 
     public static List<ItemStack> getRolledLeaves() {
         List<ItemStack> stacks = new ArrayList<>();
-        ItemStack steamed = new ItemStack(ModItems.ROLLED_TEA_LEAVES);
-        steamed.getOrCreateSubNbt("TeaData").putString("mod", "teatime:steamed");
-        stacks.add(steamed);
-        ItemStack fresh = new ItemStack(ModItems.ROLLED_TEA_LEAVES);
-        fresh.getOrCreateSubNbt("TeaData").putString("mod", "teatime:withered");
-        stacks.add(fresh);
+        for (String s : DRYING_RESULTS.keySet()) {
+            ItemStack stack = new ItemStack(ModItems.ROLLED_TEA_LEAVES);
+            stack.getOrCreateTagElement("TeaData").putString("mod", s);
+            stacks.add(stack);
+        }
         return stacks;
     }
 
     public static List<ItemStack> getTeaBags() {
         List<ItemStack> stacks = new ArrayList<>();
-        ItemStack herbalTea = new ItemStack(ModItems.TEA_BAG);
-        herbalTea.getOrCreateSubNbt("TeaData").putString("type", "teatime:herbal_tea");
-        stacks.add(herbalTea);
-        ItemStack whiteTea = new ItemStack(ModItems.TEA_BAG);
-        whiteTea.getOrCreateSubNbt("TeaData").putString("type", "teatime:white_tea");
-        stacks.add(whiteTea);
-        ItemStack greenTea = new ItemStack(ModItems.TEA_BAG);
-        greenTea.getOrCreateSubNbt("TeaData").putString("type", "teatime:green_tea");
-        stacks.add(greenTea);
-        ItemStack blackTea = new ItemStack(ModItems.TEA_BAG);
-        blackTea.getOrCreateSubNbt("TeaData").putString("type", "teatime:black_tea");
-        stacks.add(blackTea);
+        ItemStack stack = new ItemStack(ModItems.TEA_BAG);
+        for (ResourceLocation i : TeaTypes.getIds()) {
+            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
+            stacks.add(setTeaType(stack.copy(), TeaTypes.get(i)));
+        }
         return stacks;
     }
 
     public static List<ItemStack> getTea() {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack tea = new ItemStack(ModItems.TEA, 1);
-        stacks.add(setTeaType(tea.copy(), TeaTypes.HERBAL_TEA));
-        stacks.add(setTeaType(tea.copy(), TeaTypes.WHITE_TEA));
-        ItemStack greenTea = setTeaType(tea.copy(), TeaTypes.GREEN_TEA);
-        stacks.add(greenTea);
-        ItemStack blackTea = setTeaType(tea.copy(), TeaTypes.BLACK_TEA);
-        stacks.add(blackTea);
+        for (ResourceLocation i : TeaTypes.getIds()) {
+            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
+            stacks.add(setTeaType(tea.copy(), TeaTypes.get(i)));
+        }
         return stacks;
     }
 
     public static Item getDryingResult(ItemStack stack) {
-        String mod = stack.getOrCreateSubNbt("TeaData").contains("mod") ?
-                stack.getOrCreateSubNbt("TeaData").getString("mod") : "teatime:null";
+        String mod = stack.getOrCreateTagElement("TeaData").contains("mod") ?
+                stack.getOrCreateTagElement("TeaData").getString("mod") : "teatime:null";
         return DRYING_RESULTS.getOrDefault(mod, ModItems.ROLLED_TEA_LEAVES);
     }
 
     public static boolean hasDryingResult(ItemStack stack) {
-        String mod = stack.getOrCreateSubNbt("TeaData").contains("mod") ?
-                stack.getOrCreateSubNbt("TeaData").getString("mod") : "teatime:null";
+        String mod = stack.getOrCreateTagElement("TeaData").contains("mod") ?
+                stack.getOrCreateTagElement("TeaData").getString("mod") : "teatime:null";
         return DRYING_RESULTS.containsKey(mod);
     }
 
     public static String getRolledTooltip(ItemStack stack) {
-        String mod = stack.getOrCreateSubNbt("TeaData").getString("mod");
+        String mod = stack.getOrCreateTagElement("TeaData").getString("mod");
         Item result = DRYING_RESULTS.get(mod);
         if (result == null) return "";
-        return result.getTranslationKey();
+        return result.getDescriptionId();
+    }
+
+    public static String getTeaTypeStr(ItemStack stack) {
+        return stack.getOrCreateTagElement("TeaData").contains("type") ? stack.getOrCreateTagElement("TeaData").getString("type") : "teatime:empty";
     }
 
     public static TeaType getTeaType(ItemStack stack) {
-        return getTeaType(stack.getOrCreateSubNbt("TeaData"));
+        return getTeaType(stack.getOrCreateTagElement("TeaData"));
     }
 
-    public static TeaType getTeaType(NbtCompound teaData) {
+    public static TeaType getTeaType(CompoundTag teaData) {
         String type = teaData.contains("type") ? teaData.getString("type") : "teatime:empty";
-        return TeaTypes.containsId(new Identifier(type)) ? TeaTypes.get(new Identifier(type)) : TeaTypes.EMPTY;
+        return TeaTypes.containsId(new ResourceLocation(type)) ? TeaTypes.get(new ResourceLocation(type)) : TeaTypes.EMPTY;
     }
 
     public static ItemStack setTeaType(ItemStack stack, TeaType type) {
-        stack.getOrCreateSubNbt("TeaData").putString("type", TeaTypes.getId(type).toString());
+        stack.getOrCreateTagElement("TeaData").putString("type", TeaTypes.getId(type).toString());
         return stack;
     }
 
@@ -102,7 +94,8 @@ public final class TeaTimeUtils {
     }
 
     public static int getTeaColor(ItemStack stack) {
-        int colour = getTeaType(stack).getColour();
+        int colour = 0;
+        if (getTeaType(stack) != null) colour = getTeaType(stack).getColour();
         float r = (colour >> 16 & 255) / 255.0F;
         float g = (colour >> 8 & 255) / 255.0F;
         float b = (colour & 255) / 255.0F;

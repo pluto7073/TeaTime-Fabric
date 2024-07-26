@@ -3,21 +3,18 @@ package ml.pluto7073.teatime.event;
 import ml.pluto7073.teatime.recipe.ModRecipes;
 import ml.pluto7073.teatime.recipe.RollingRecipe;
 import ml.pluto7073.teatime.tags.ModBlockTags;
-import ml.pluto7073.teatime.utils.RollableTeaLeavesUtil;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Optional;
 import java.util.Random;
 
 public class RollTeaLeaves {
@@ -25,47 +22,47 @@ public class RollTeaLeaves {
     public static final Random RANDOM = new Random();
 
     public static void rollLeavesEvent() {
-        RecipeManager.MatchGetter<Inventory, ? extends RollingRecipe> matchGetter = RecipeManager.createCachedMatchGetter(ModRecipes.ROLLING);
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+        RecipeManager.CachedCheck<Container, ? extends RollingRecipe> matchGetter = RecipeManager.createCheck(ModRecipes.ROLLING);
+        UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
             if (player == null ) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
-            ItemStack stack = player.getStackInHand(hand);
+            ItemStack stack = player.getItemInHand(hand);
             BlockPos pos = hitResult.getBlockPos();
-            BlockState state = world.getBlockState(pos);
+            BlockState state = level.getBlockState(pos);
 
             if (state == null) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
-            if (!state.isIn(ModBlockTags.WORKSTATIONS)) {
-                return ActionResult.PASS;
+            if (!state.is(ModBlockTags.WORKSTATIONS)) {
+                return InteractionResult.PASS;
             }
 
-            SimpleInventory inventory = new SimpleInventory(1);
-            inventory.setStack(0, stack);
-            RollingRecipe recipe = matchGetter.getFirstMatch(inventory, world).orElse(null);
+            SimpleContainer container = new SimpleContainer(1);
+            container.setItem(0, stack);
+            RollingRecipe recipe = matchGetter.getRecipeFor(container, level).orElse(null);
 
             if (recipe == null) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
-            ItemStack result = recipe.craft(inventory);
-            world.playSound(null, pos, SoundEvents.ITEM_BONE_MEAL_USE, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            ItemStack result = recipe.craft(container);
+            level.playSound(null, pos, SoundEvents.BONE_MEAL_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
             if (!result.isEmpty()) {
-                if (!world.isClient) {
+                if (!level.isClientSide) {
                     ItemEntity entity = new ItemEntity(
-                            player.getWorld(),
-                            hitResult.getPos().x,
-                            hitResult.getPos().y,
-                            hitResult.getPos().z,
+                            player.level(),
+                            hitResult.getLocation().x,
+                            hitResult.getLocation().y,
+                            hitResult.getLocation().z,
                             result.copy());
-                    player.getWorld().spawnEntity(entity);
-                    stack.decrement(1);
-                    player.setStackInHand(hand, stack);
+                    player.level().addFreshEntity(entity);
+                    stack.shrink(1);
+                    player.setItemInHand(hand, stack);
                 }
             }
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
 
     }

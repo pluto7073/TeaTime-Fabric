@@ -1,14 +1,12 @@
 package ml.pluto7073.teatime.tags;
 
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 
 public class ModBlockTags {
 
-    public static final TagKey<Block> WORKSTATIONS = TagKey.of(RegistryKeys.BLOCK, new Identifier("c:workstations"));
+    public static final TagKey<Block> WORKSTATIONS = TagKey.create(Registries.BLOCK, new ResourceLocation("c:workstations"));
 
 }

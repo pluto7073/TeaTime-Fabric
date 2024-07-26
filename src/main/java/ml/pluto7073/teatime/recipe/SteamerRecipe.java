@@ -4,30 +4,31 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import ml.pluto7073.teatime.block.ModBlocks;
 import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
-public class SteamerRecipe implements Recipe<Inventory> {
+@MethodsReturnNonnullByDefault
+public class SteamerRecipe implements Recipe<Container> {
 
-    protected final Identifier id;
+    protected final ResourceLocation id;
     protected final String group;
     protected final Ingredient input;
     public final ItemStack output;
     protected final int steamTime;
 
-    public SteamerRecipe(Identifier id, String group, Ingredient input, ItemStack output, int steamTime) {
+    public SteamerRecipe(ResourceLocation id, String group, Ingredient input, ItemStack output, int steamTime) {
         this.id = id;
         this.group = group;
         this.input = input;
@@ -36,40 +37,40 @@ public class SteamerRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public boolean matches(Inventory inventory, World world) {
-        return this.input.test(inventory.getStack(SteamerBlockEntity.INPUT_SLOT_INDEX));
+    public boolean matches(Container container, Level level) {
+        return this.input.test(container.getItem(SteamerBlockEntity.INPUT_SLOT_INDEX));
     }
 
     @Override
-    public ItemStack craft(Inventory inventory, DynamicRegistryManager manager) {
+    public ItemStack assemble(Container container, RegistryAccess manager) {
         return this.output.copy();
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
     @Override
-    public DefaultedList<Ingredient> getIngredients() {
-        DefaultedList<Ingredient> ingredients = DefaultedList.of();
+    public NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> ingredients = NonNullList.create();
         ingredients.add(this.input);
         return ingredients;
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager manager) {
+    public ItemStack getResultItem(RegistryAccess manager) {
         return this.output;
     }
 
     @Override
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return this.id;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return null;
+        return ModRecipes.STEAMING_SERIALIZER;
     }
 
     @Override
@@ -87,7 +88,7 @@ public class SteamerRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public ItemStack createIcon() {
+    public ItemStack getToastSymbol() {
         return new ItemStack(ModBlocks.STEAMER);
     }
 
@@ -100,32 +101,32 @@ public class SteamerRecipe implements Recipe<Inventory> {
         }
 
         @Override
-        public SteamerRecipe read(Identifier id, JsonObject json) {
-            String group = JsonHelper.getString(json, "group", "");
-            JsonElement ingredientJson = JsonHelper.hasArray(json, "ingredient") ?
-                    JsonHelper.getArray(json, "ingredient") : JsonHelper.getObject(json, "ingredient");
+        public SteamerRecipe fromJson(ResourceLocation id, JsonObject json) {
+            String group = GsonHelper.getAsString(json, "group", "");
+            JsonElement ingredientJson = GsonHelper.isArrayNode(json, "ingredient") ?
+                    GsonHelper.getAsJsonArray(json, "ingredient") : GsonHelper.getAsJsonObject(json, "ingredient");
             Ingredient input = Ingredient.fromJson(ingredientJson);
-            Identifier resultId = new Identifier(JsonHelper.getString(json, "result"));
-            ItemStack result = new ItemStack(Registries.ITEM.getOrEmpty(resultId).orElseThrow(() ->
+            ResourceLocation resultId = new ResourceLocation(GsonHelper.getAsString(json, "result"));
+            ItemStack result = new ItemStack(BuiltInRegistries.ITEM.getOptional(resultId).orElseThrow(() ->
                     new IllegalStateException("Item: " + resultId + " does not exist")));
-            int time = JsonHelper.getInt(json, "steamtime", this.steamTime);
+            int time = GsonHelper.getAsInt(json, "steamtime", this.steamTime);
             return new SteamerRecipe(id, group, input, result, time);
         }
 
         @Override
-        public SteamerRecipe read(Identifier id, PacketByteBuf buf) {
-            String group = buf.readString();
-            Ingredient input = Ingredient.fromPacket(buf);
-            ItemStack result = buf.readItemStack();
+        public SteamerRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+            String group = buf.readUtf();
+            Ingredient input = Ingredient.fromNetwork(buf);
+            ItemStack result = buf.readItem();
             int time = buf.readVarInt();
             return new SteamerRecipe(id, group, input, result, time);
         }
 
         @Override
-        public void write(PacketByteBuf buf, SteamerRecipe recipe) {
-            buf.writeString(recipe.group);
-            recipe.input.write(buf);
-            buf.writeItemStack(recipe.output);
+        public void toNetwork(FriendlyByteBuf buf, SteamerRecipe recipe) {
+            buf.writeUtf(recipe.group);
+            recipe.input.toNetwork(buf);
+            buf.writeItem(recipe.output);
             buf.writeVarInt(recipe.steamTime);
         }
     }

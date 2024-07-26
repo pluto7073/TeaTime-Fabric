@@ -2,39 +2,44 @@ package ml.pluto7073.teatime.block.entity;
 
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import ml.pluto7073.teatime.gui.handlers.SteamerScreenHandler;
+import ml.pluto7073.teatime.gui.handlers.SteamerMenu;
 import ml.pluto7073.teatime.recipe.ModRecipes;
 import ml.pluto7073.teatime.recipe.SteamerRecipe;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.*;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.RecipeHolder;
+import net.minecraft.world.inventory.StackedContentsCompatible;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public class SteamerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
+@MethodsReturnNonnullByDefault
+public class SteamerBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, RecipeHolder, StackedContentsCompatible {
 
     public static final int INPUT_SLOT_INDEX = 0;
     public static final int WATER_SLOT_INDEX = 1;
@@ -49,19 +54,19 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
     public static final int IS_BOILING_PROPERTY_INDEX = 4;
     public static final int PROPERTY_COUNT = 5;
     public static final int DEFAULT_STEAM_TIME = 1200;
-    protected DefaultedList<ItemStack> inventory;
+    protected NonNullList<ItemStack> inventory;
     public int waterTime;
     public int totalWater;
     public int steamTime;
     public int steamTimeTotal;
-    public final PropertyDelegate propertyDelegate;
-    private final Object2IntOpenHashMap<Identifier> recipesUsed;
-    private final RecipeManager.MatchGetter<Inventory, ? extends SteamerRecipe> matchGetter;
+    public final ContainerData propertyDelegate;
+    private final Object2IntOpenHashMap<ResourceLocation> recipesUsed;
+    private final RecipeManager.CachedCheck<Container, ? extends SteamerRecipe> matchGetter;
 
     public SteamerBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ModBlockEntityTypes.STEAMER_TYPE, blockPos, blockState);
-        this.inventory = DefaultedList.ofSize(3, ItemStack.EMPTY);
-        this.propertyDelegate = new PropertyDelegate() {
+        this.inventory = NonNullList.withSize(3, ItemStack.EMPTY);
+        this.propertyDelegate = new ContainerData() {
             @Override
             public int get(int index) {
                 switch (index) {
@@ -78,7 +83,7 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
                         return SteamerBlockEntity.this.steamTimeTotal;
                     }
                     case IS_BOILING_PROPERTY_INDEX -> {
-                        return SteamerBlockEntity.this.isBoiling(blockPos, world) ? 1 : 0;
+                        return SteamerBlockEntity.this.isBoiling(blockPos, level) ? 1 : 0;
                     }
                     default -> {
                         return 0;
@@ -107,12 +112,12 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
             }
 
             @Override
-            public int size() {
+            public int getCount() {
                 return PROPERTY_COUNT;
             }
         };
         this.recipesUsed = new Object2IntOpenHashMap<>();
-        this.matchGetter = RecipeManager.createCachedMatchGetter(ModRecipes.STEAMING);
+        this.matchGetter = RecipeManager.createCheck(ModRecipes.STEAMING);
     }
 
     public static Map<Item, Integer> createWaterTimeMap() {
@@ -122,13 +127,13 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
         return map;
     }
 
-    private static void addWaterInput(Map<Item, Integer> waterSizes, ItemConvertible item, int waterSize) {
+    private static void addWaterInput(Map<Item, Integer> waterSizes, ItemLike item, int waterSize) {
         waterSizes.put(item.asItem(), waterSize);
     }
 
-    public boolean isBoiling(BlockPos pos, World world) {
-        BlockState campfire = world.getBlockState(pos.down());
-        if (!campfire.isIn(BlockTags.CAMPFIRES)) {
+    public boolean isBoiling(BlockPos pos, Level level) {
+        BlockState campfire = level.getBlockState(pos.below());
+        if (!campfire.is(BlockTags.CAMPFIRES)) {
             return false;
         }
         if (!CampfireBlock.isLitCampfire(campfire)) {
@@ -138,79 +143,79 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
     }
 
     @Override
-    protected Text getContainerName() {
-        return Text.translatable("container.steamer");
+    protected Component getDefaultName() {
+        return Component.translatable("container.steamer");
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        Inventories.readNbt(nbt, this.inventory);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
+        this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(nbt, this.inventory);
         this.waterTime = nbt.getShort("WaterTime");
         this.steamTime = nbt.getShort("SteamTime");
         this.steamTimeTotal = nbt.getShort("SteamTimeTotal");
         this.totalWater = getWaterSize(this.inventory.get(WATER_SLOT_INDEX));
-        NbtCompound recipes = nbt.getCompound("RecipesUsed");
-        for (String key : recipes.getKeys()) {
-            this.recipesUsed.put(new Identifier(key), recipes.getInt(key));
+        CompoundTag recipes = nbt.getCompound("RecipesUsed");
+        for (String key : recipes.getAllKeys()) {
+            this.recipesUsed.put(new ResourceLocation(key), recipes.getInt(key));
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void saveAdditional(CompoundTag nbt) {
+        super.saveAdditional(nbt);
         nbt.putShort("WaterTime", (short) this.waterTime);
         nbt.putShort("SteamTime", (short) this.steamTime);
         nbt.putShort("SteamTimeTotal", (short) this.steamTimeTotal);
-        Inventories.writeNbt(nbt, this.inventory);
-        NbtCompound recipes = new NbtCompound();
+        ContainerHelper.saveAllItems(nbt, this.inventory);
+        CompoundTag recipes = new CompoundTag();
         this.recipesUsed.forEach((identifier, count) -> recipes.putInt(identifier.toString(), count));
         nbt.put("RecipesUsed", recipes);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, SteamerBlockEntity blockEntity) {
-        boolean boiling = blockEntity.isBoiling(pos, world);
+    public static void tick(Level level, BlockPos pos, BlockState state, SteamerBlockEntity blockEntity) {
+        boolean boiling = blockEntity.isBoiling(pos, level);
         boolean dirty = false;
-        if (blockEntity.isBoiling(pos, world)) {
+        if (blockEntity.isBoiling(pos, level)) {
             --blockEntity.waterTime;
         }
 
         ItemStack waterStack = blockEntity.inventory.get(WATER_SLOT_INDEX);
         boolean hasInput = !blockEntity.inventory.get(INPUT_SLOT_INDEX).isEmpty();
         boolean hasWaterItem = !waterStack.isEmpty();
-        if (blockEntity.isBoiling(pos, world) || hasInput && hasWaterItem) {
+        if (blockEntity.isBoiling(pos, level) || hasInput && hasWaterItem) {
             SteamerRecipe recipe;
             if (hasInput) {
-                recipe = blockEntity.matchGetter.getFirstMatch(blockEntity, world).orElse(null);
+                recipe = blockEntity.matchGetter.getRecipeFor(blockEntity, level).orElse(null);
             } else {
                 recipe = null;
             }
 
-            int i = blockEntity.getMaxCountPerStack();
-            if (!blockEntity.isBoiling(pos, world) && canAcceptRecipeOutput(recipe, blockEntity.inventory, i)) {
+            int i = blockEntity.getMaxStackSize();
+            if (!blockEntity.isBoiling(pos, level) && canAcceptRecipeOutput(recipe, blockEntity.inventory, i)) {
                 blockEntity.waterTime = blockEntity.getWaterSize(waterStack);
                 blockEntity.totalWater = blockEntity.waterTime;
-                if (blockEntity.isBoiling(pos, world)) {
+                if (blockEntity.isBoiling(pos, level)) {
                     dirty = true;
                     if (hasWaterItem) {
                         Item item = waterStack.getItem();
-                        waterStack.decrement(1);
+                        waterStack.shrink(1);
                         if (waterStack.isEmpty()) {
-                            Item remainder = item.getRecipeRemainder();
+                            Item remainder = item.getCraftingRemainingItem();
                             blockEntity.inventory.set(WATER_SLOT_INDEX, remainder == null ? ItemStack.EMPTY : new ItemStack(remainder));
                         }
                     }
                 }
             }
 
-            if (blockEntity.isBoiling(pos, world) && canAcceptRecipeOutput(recipe, blockEntity.inventory, i)) {
+            if (blockEntity.isBoiling(pos, level) && canAcceptRecipeOutput(recipe, blockEntity.inventory, i)) {
                 ++blockEntity.steamTime;
                 if (blockEntity.steamTime == blockEntity.steamTimeTotal) {
                     blockEntity.steamTime = 0;
-                    blockEntity.steamTimeTotal = getSteamTime(world, blockEntity);
+                    blockEntity.steamTimeTotal = getSteamTime(level, blockEntity);
                     if (craftRecipe(recipe, blockEntity.inventory, i)) {
-                        blockEntity.setLastRecipe(recipe);
+                        blockEntity.setRecipeUsed(recipe);
                     }
 
                     dirty = true;
@@ -218,20 +223,20 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
             } else {
                 blockEntity.steamTime = 0;
             }
-        } else if (!blockEntity.isBoiling(pos, world) && blockEntity.steamTime > 0) {
-            blockEntity.steamTime = MathHelper.clamp(blockEntity.steamTime - 2, 0, blockEntity.steamTimeTotal);
+        } else if (!blockEntity.isBoiling(pos, level) && blockEntity.steamTime > 0) {
+            blockEntity.steamTime = Mth.clamp(blockEntity.steamTime - 2, 0, blockEntity.steamTimeTotal);
         }
 
-        if (boiling != blockEntity.isBoiling(pos, world)) {
+        if (boiling != blockEntity.isBoiling(pos, level)) {
             dirty = true;
         }
 
         if (dirty) {
-            markDirty(world, pos, state);
+            setChanged(level, pos, state);
         }
     }
 
-    private static boolean canAcceptRecipeOutput(@Nullable SteamerRecipe recipe, DefaultedList<ItemStack> slots, int count) {
+    private static boolean canAcceptRecipeOutput(@Nullable SteamerRecipe recipe, NonNullList<ItemStack> slots, int count) {
         if (!slots.get(INPUT_SLOT_INDEX).isEmpty() && recipe != null) {
             ItemStack wantedOutput = recipe.output;
             if (wantedOutput.isEmpty()) {
@@ -242,10 +247,10 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
                     return true;
                 } else if (!outputSlot.getItem().equals(wantedOutput.getItem())) {
                     return false;
-                } else if (outputSlot.getCount() < count && outputSlot.getCount() < outputSlot.getMaxCount()) {
+                } else if (outputSlot.getCount() < count && outputSlot.getCount() < outputSlot.getMaxStackSize()) {
                     return true;
                 } else {
-                    return outputSlot.getCount() < wantedOutput.getMaxCount();
+                    return outputSlot.getCount() < wantedOutput.getMaxStackSize();
                 }
             }
         } else {
@@ -253,18 +258,18 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
         }
     }
 
-    private static boolean craftRecipe(@Nullable SteamerRecipe recipe, DefaultedList<ItemStack> slots, int count) {
+    private static boolean craftRecipe(@Nullable SteamerRecipe recipe, NonNullList<ItemStack> slots, int count) {
         if (recipe != null && canAcceptRecipeOutput(recipe, slots, count)) {
             ItemStack input = slots.get(INPUT_SLOT_INDEX);
             ItemStack output = recipe.output.copy();
             ItemStack outputSlot = slots.get(OUTPUT_SLOT_INDEX);
             if (outputSlot.isEmpty()) {
                 slots.set(OUTPUT_SLOT_INDEX, output.copy());
-            } else if (outputSlot.isOf(output.getItem())) {
-                outputSlot.increment(1);
+            } else if (outputSlot.is(output.getItem())) {
+                outputSlot.grow(1);
             }
 
-            input.decrement(1);
+            input.shrink(1);
             return true;
         } else {
             return false;
@@ -280,15 +285,15 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
         }
     }
 
-    private static int getSteamTime(World world, SteamerBlockEntity blockEntity) {
-        return blockEntity.matchGetter.getFirstMatch(blockEntity, world).map(SteamerRecipe::getSteamTime).orElse(DEFAULT_STEAM_TIME);
+    private static int getSteamTime(Level level, SteamerBlockEntity blockEntity) {
+        return blockEntity.matchGetter.getRecipeFor(blockEntity, level).map(SteamerRecipe::getSteamTime).orElse(DEFAULT_STEAM_TIME);
     }
 
     public static boolean canUseAsWater(ItemStack item) {
         return createWaterTimeMap().containsKey(item.getItem());
     }
 
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         if (side == Direction.DOWN) {
             return BOTTOM_SLOTS;
         } else {
@@ -297,26 +302,26 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return new SteamerScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
+    protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
+        return new SteamerMenu(syncId, playerInventory, this, this.propertyDelegate);
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return this.isValid(slot, stack);
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         if (dir == Direction.DOWN && slot == WATER_SLOT_INDEX) {
-            return stack.isOf(Items.BUCKET) || stack.isOf(Items.GLASS_BOTTLE);
+            return stack.is(Items.BUCKET) || stack.is(Items.GLASS_BOTTLE);
         } else {
             return true;
         }
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return this.inventory.size();
     }
 
@@ -331,46 +336,45 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
-        return Inventories.splitStack(this.inventory, slot, amount);
+    public ItemStack removeItem(int slot, int amount) {
+        return ContainerHelper.removeItem(this.inventory, slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
-        return Inventories.removeStack(this.inventory, slot);
+    public ItemStack removeItemNoUpdate(int slot) {
+        return ContainerHelper.takeItem(this.inventory, slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         ItemStack s = this.inventory.get(slot);
-        boolean canInsert = !stack.isEmpty() && stack.getItem().equals(s.getItem()) && ItemStack.areEqual(s, stack);
+        boolean canInsert = !stack.isEmpty() && stack.getItem().equals(s.getItem()) && ItemStack.isSameItemSameTags(s, stack);
         this.inventory.set(slot, stack);
-        if (stack.getCount() > this.getMaxCountPerStack()) {
-            stack.setCount(this.getMaxCountPerStack());
+        if (stack.getCount() > this.getMaxStackSize()) {
+            stack.setCount(this.getMaxStackSize());
         }
 
         if (slot == 0 && !canInsert) {
-            this.steamTimeTotal = getSteamTime(this.world, this);
+            this.steamTimeTotal = getSteamTime(this.level, this);
             this.steamTime = 0;
-            this.markDirty();
+            this.setChanged();
         }
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        if (this.world.getBlockEntity(this.pos) != this) {
+    public boolean stillValid(Player player) {
+        if (this.level.getBlockEntity(worldPosition) != this) {
             return false;
         } else {
-            return player.squaredDistanceTo(this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5) <= 64.0;
+            return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 64.0;
         }
     }
 
-    @Override
     public boolean isValid(int slot, ItemStack stack) {
         if (slot == OUTPUT_SLOT_INDEX) {
             return false;
@@ -382,28 +386,29 @@ public class SteamerBlockEntity extends LockableContainerBlockEntity implements 
     }
 
     @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
+    public void fillStackedContents(StackedContents contents) {
         for (ItemStack stack : this.inventory) {
-            finder.addInput(stack);
+            contents.accountStack(stack);
         }
     }
 
     @Override
-    public void setLastRecipe(@Nullable Recipe<?> recipe) {
+    public void setRecipeUsed(@Nullable Recipe<?> recipe) {
         if (recipe != null) {
-            Identifier identifier = recipe.getId();
+            ResourceLocation identifier = recipe.getId();
             this.recipesUsed.addTo(identifier, 1);
         }
     }
 
     @Nullable
     @Override
-    public Recipe<?> getLastRecipe() {
+    public Recipe<?> getRecipeUsed() {
         return null;
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         this.inventory.clear();
     }
+
 }

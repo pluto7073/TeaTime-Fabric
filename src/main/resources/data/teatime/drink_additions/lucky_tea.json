@@ -1,0 +1,10 @@
+{
+  "changesColor": true,
+  "color": 2973733,
+  "onDrinkAdditions": [
+    {
+      "type": "teatime:add_tea_effects",
+      "tea": "teatime:lucky_tea"
+    }
+  ]
+}

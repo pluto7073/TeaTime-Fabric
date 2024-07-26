@@ -1,0 +1,10 @@
+{
+  "changesColor": true,
+  "color": 16245903,
+  "onDrinkAdditions": [
+    {
+      "type": "teatime:add_tea_effects",
+      "tea": "teatime:rose_tea"
+    }
+  ]
+}

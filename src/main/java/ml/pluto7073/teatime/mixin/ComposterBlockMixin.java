@@ -1,8 +1,8 @@
 package ml.pluto7073.teatime.mixin;
 
 import ml.pluto7073.teatime.item.ModItems;
-import net.minecraft.block.ComposterBlock;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.ComposterBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ComposterBlockMixin {
 
     @Shadow
-    private static void registerCompostableItem(float levelIncreaseChance, ItemConvertible item) {
+    private static void add(float chance, ItemLike item) {
     }
 
-    @Inject(at = @At("TAIL"), method = "registerDefaultCompostableItems")
+    @Inject(at = @At("TAIL"), method = "bootStrap")
     private static void teatime_registerModCompostItems(CallbackInfo ci) {
-        registerCompostableItem(0.3F, ModItems.TEA_SEEDS);
-        registerCompostableItem(0.3F, ModItems.TEA_LEAVES);
+        add(0.3F, ModItems.TEA_SEEDS);
+        add(0.3F, ModItems.TEA_LEAVES);
     }
 
 }

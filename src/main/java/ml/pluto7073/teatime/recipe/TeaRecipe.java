@@ -1,44 +1,44 @@
 package ml.pluto7073.teatime.recipe;
 
-import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
-public class TeaRecipe extends SpecialCraftingRecipe {
+@MethodsReturnNonnullByDefault
+public class TeaRecipe extends CustomRecipe {
 
-    public TeaRecipe(Identifier id, CraftingRecipeCategory category) {
+    public TeaRecipe(ResourceLocation id, CraftingBookCategory category) {
         super(id, category);
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingContainer container, Level world) {
         boolean hasWaterBottle = false;
         boolean hasTeaBag = false;
 
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0; i < container.getContainerSize(); ++i) {
+            ItemStack stack = container.getItem(i);
             if (stack.isEmpty()) continue;
-            if (stack.isOf(Items.POTION) && !hasWaterBottle) {
-                if (PotionUtil.getPotion(stack).equals(Potions.WATER)) {
+            if (stack.is(Items.POTION) && !hasWaterBottle) {
+                if (PotionUtils.getPotion(stack).equals(Potions.WATER)) {
                     hasWaterBottle = true;
                 } else {
                     return false;
                 }
             } else {
-                if (!stack.isOf(ModItems.TEA_BAG) || hasTeaBag) {
+                if (!stack.is(ModItems.TEA_BAG) || hasTeaBag) {
                     return false;
                 }
                 hasTeaBag = true;
@@ -48,11 +48,11 @@ public class TeaRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager manager) {
+    public ItemStack assemble(CraftingContainer container, RegistryAccess manager) {
         ItemStack teaBag = ItemStack.EMPTY;
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
-            if (stack.isOf(ModItems.TEA_BAG)) {
+        for (int i = 0; i < container.getContainerSize(); ++i) {
+            ItemStack stack = container.getItem(i);
+            if (stack.is(ModItems.TEA_BAG)) {
                 teaBag = stack;
                 break;
             }
@@ -62,7 +62,7 @@ public class TeaRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width >= 1 && height >= 1;
     }
 

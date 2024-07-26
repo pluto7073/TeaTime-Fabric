@@ -1,31 +1,44 @@
 package ml.pluto7073.teatime.block;
 
 import ml.pluto7073.teatime.item.ModItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.swing.text.html.BlockView;
+
+@MethodsReturnNonnullByDefault
 public class TeaShrub extends CropBlock {
 
-    private static final VoxelShape[] AGE_TO_SHAPE = new VoxelShape[]{Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 5.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 7.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D), Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D)};
+    private static final VoxelShape[] AGE_TO_SHAPE = new VoxelShape[] {
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 5.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 7.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D)
+    };
 
-    public TeaShrub(Settings settings) {
+    public TeaShrub(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected ItemConvertible getSeedsItem() {
+    protected ItemLike getBaseSeedId() {
         return ModItems.TEA_SEEDS;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return AGE_TO_SHAPE[state.get(this.getAgeProperty())];
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return AGE_TO_SHAPE[state.getValue(this.getAgeProperty())];
     }
 
 }

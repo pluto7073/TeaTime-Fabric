@@ -1,0 +1,10 @@
+{
+  "changesColor": true,
+  "color": 13719422,
+  "onDrinkAdditions": [
+    {
+      "type": "teatime:add_tea_effects",
+      "tea": "teatime:healing_tea"
+    }
+  ]
+}

@@ -2,34 +2,33 @@ package ml.pluto7073.teatime.item;
 
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.block.ModBlocks;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.AliasedBlockItem;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemNameBlockItem;
 
 public class ModItems {
 
-    public static final Item TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item WITHERED_TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item WHITE_TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item STEAMED_TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeaves(new Item.Settings());
-    public static final Item FERMENTED_TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item DRIED_TEA_LEAVES = new Item(new Item.Settings());
-    public static final Item TEA_BAG = new TeaBagItem(new Item.Settings());
-    public static final Item TEA = new Tea(new Item.Settings());
-    public static final Item TEA_SEEDS = new AliasedBlockItem(ModBlocks.TEA_SHRUB, new Item.Settings());
-    public static final Item STEAMER = new BlockItem(ModBlocks.STEAMER, new Item.Settings());
+    public static final Item TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item WITHERED_TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item WHITE_TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item STEAMED_TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeaves(new Item.Properties());
+    public static final Item FERMENTED_TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item DRIED_TEA_LEAVES = new Item(new Item.Properties());
+    public static final Item TEA_BAG = new TeaBagItem(new Item.Properties());
+    public static final Item TEA = new Tea(new Item.Properties());
+    public static final Item TEA_SEEDS = new ItemNameBlockItem(ModBlocks.TEA_SHRUB, new Item.Properties());
+    public static final Item STEAMER = new BlockItem(ModBlocks.STEAMER, new Item.Properties());
 
     private static void register(String id, Item item) {
-        Registry.register(Registries.ITEM, new Identifier(TeaTime.MOD_ID, id), item);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(TeaTime.MOD_ID, id), item);
     }
 
-    private static void register(Identifier id, Item item) {
-        Registry.register(Registries.ITEM, id, item);
+    private static void register(ResourceLocation id, Item item) {
+        Registry.register(BuiltInRegistries.ITEM, id, item);
     }
 
     public static void init() {

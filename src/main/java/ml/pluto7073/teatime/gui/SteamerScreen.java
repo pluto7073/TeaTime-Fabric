@@ -1,128 +1,51 @@
 package ml.pluto7073.teatime.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import ml.pluto7073.teatime.TeaTime;
-import ml.pluto7073.teatime.gui.handlers.SteamerScreenHandler;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import ml.pluto7073.teatime.gui.handlers.SteamerMenu;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 
-public class SteamerScreen extends HandledScreen<SteamerScreenHandler> implements RecipeBookProvider {
+public class SteamerScreen extends AbstractContainerScreen<SteamerMenu> {
 
-    private static final Identifier RECIPE_BUTTON_TEXTURE = new Identifier("textures/gui/recipe_button.png");
-    private static final Identifier TEXTURE = new Identifier(TeaTime.MOD_ID, "textures/gui/container/steamer.png");
-    public final RecipeBookWidget recipeBook = new RecipeBookWidget();
-    private boolean narrow;
+    private static final ResourceLocation TEXTURE = TeaTime.asId("textures/gui/container/steamer.png");
 
-    public SteamerScreen(SteamerScreenHandler handler, PlayerInventory playerInventory, Text title) {
+    public SteamerScreen(SteamerMenu handler, Inventory playerInventory, Component title) {
         super(handler, playerInventory, title);
     }
 
     public void init() {
         super.init();
-        this.narrow = this.width < 379;
-        this.recipeBook.initialize(this.width, this.height, this.client, this.narrow, this.handler);
-        this.x = this.recipeBook.findLeftEdge(this.width, this.backgroundWidth);
-        this.addDrawableChild(new TexturedButtonWidget(this.x + 20, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, button -> {
-            this.recipeBook.toggleOpen();
-            this.x = this.recipeBook.findLeftEdge(this.width, this.backgroundWidth);
-            button.setPosition(this.x + 20, this.height / 2 - 49);
-        }));
-        this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
-    }
-
-    public void handledScreenTick() {
-        super.handledScreenTick();
-        this.recipeBook.update();
+        this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
-        if (this.recipeBook.isOpen() && this.narrow) {
-            this.drawBackground(context, delta, mouseX, mouseY);
-            this.recipeBook.render(context, mouseX, mouseY, delta);
-        } else {
-            this.recipeBook.render(context, mouseX, mouseY, delta);
-            super.render(context, mouseX, mouseY, delta);
-            this.recipeBook.drawGhostSlots(context, this.x, this.y, true, delta);
-        }
-
-        this.drawMouseoverTooltip(context, mouseX, mouseY);
-        this.recipeBook.drawTooltip(context, this.x, this.y, mouseX, mouseY);
+        super.render(context, mouseX, mouseY, delta);
+        this.renderTooltip(context, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        int x = this.x;
-        int y = this.y;
-        int i = (this.width - this.backgroundWidth) / 2;
-        int j = (this.height - this.backgroundHeight) / 2;
-        context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        int x = this.leftPos;
+        int y = this.topPos;
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
+        context.blit(TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
         int k;
-        if (this.handler.isBoiling()) {
-            k = this.handler.getWaterProgress();
-            context.drawTexture(TEXTURE, x + 56, y + 36 + 12 - k, 176, 12 - k, 14, k + 1);
+        if (this.menu.isBoiling()) {
+            k = this.menu.getWaterProgress();
+            context.blit(TEXTURE, x + 56, y + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        k = this.handler.getSteamProgress();
-        context.drawTexture(TEXTURE, x + 79, y + 34, 176, 14, k + 1, 16);
+        k = this.menu.getSteamProgress();
+        context.blit(TEXTURE, x + 79, y + 34, 176, 14, k + 1, 16);
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.recipeBook.mouseClicked(mouseX, mouseY, button)) {
-            return true;
-        } else {
-            return this.narrow && this.recipeBook.isOpen() || super.mouseClicked(mouseX, mouseY, button);
-        }
-    }
-
-    @Override
-    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-        super.onMouseClick(slot, slotId, button, actionType);
-        this.recipeBook.slotClicked(slot);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return !this.recipeBook.keyPressed(keyCode, scanCode, modifiers) && super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
-        boolean bl = mouseX < (double)left || mouseY < (double)top || mouseX >= (double)(left + this.backgroundWidth) || mouseY >= (double)(top + this.backgroundHeight);
-        return this.recipeBook.isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth, this.backgroundHeight, button) && bl;
-    }
-
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        return this.recipeBook.charTyped(chr, modifiers) || super.charTyped(chr, modifiers);
-    }
-
-    @Override
-    public void refreshRecipeBook() {
-        this.recipeBook.refresh();
-    }
-
-    @Override
-    public RecipeBookWidget getRecipeBookWidget() {
-        return this.recipeBook;
-    }
-
-    @Override
-    public void removed() {
-        if (this.recipeBook.isOpen()) this.recipeBook.toggleOpen();
-        super.removed();
-    }
 }
