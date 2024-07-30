@@ -9,6 +9,7 @@ import ml.pluto7073.teatime.recipe.special.SpecialAdditionRecipe;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypes;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -17,13 +18,15 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class TeaInLatteAdditionRecipe extends SpecialAdditionRecipe {
 
-    public TeaInLatteAdditionRecipe(ResourceLocation id) {
-        super(id);
+    public TeaInLatteAdditionRecipe(ResourceLocation id, ResourceLocation teaType) {
+        super(id, Ingredient.of(BuiltInRegistries.ITEM.get(new ResourceLocation("plutoscoffee:latte"))),
+                Ingredient.of(TeaTimeUtils.setTeaType(new ItemStack(ModItems.TEA_BAG), teaType)), teaType.toString());
     }
 
     @Override
@@ -34,23 +37,11 @@ public class TeaInLatteAdditionRecipe extends SpecialAdditionRecipe {
     @Override
     public boolean matches(Container container, Level level) {
         Item latteItem = BuiltInRegistries.ITEM.get(new ResourceLocation("plutoscoffee:latte"));
-        if (latteItem == null || Items.AIR.equals(latteItem)) return false;
+        if (!FabricLoader.getInstance().isModLoaded("plutoscoffee")) return false;
         ItemStack input = container.getItem(0), addition = container.getItem(1);
         if (!input.is(latteItem)) return false;
         if (!addition.is(ModItems.TEA_BAG)) return false;
-        return TeaTimeUtils.getTeaType(addition) != TeaTypes.EMPTY;
-    }
-
-    @Override
-    public ItemStack craft(Container container) {
-        ItemStack stack = container.getItem(0).copy();
-        ItemStack teaBag = container.getItem(1);
-        ListTag resAdds = stack.getOrCreateTagElement(AbstractCustomizableDrinkItem.DRINK_DATA_NBT_KEY)
-                .getList(DrinkAdditions.ADDITIONS_NBT_KEY, Tag.TAG_STRING);
-        resAdds.add(DrinkUtil.stringAsNbt(TeaTimeUtils.getTeaTypeStr(teaBag)));
-        stack.getOrCreateTagElement(AbstractCustomizableDrinkItem.DRINK_DATA_NBT_KEY).put(DrinkAdditions.ADDITIONS_NBT_KEY, resAdds);
-
-        return stack;
+        return TeaTimeUtils.getTeaTypeId(addition).equals(getResultId());
     }
 
     @Override
@@ -61,7 +52,7 @@ public class TeaInLatteAdditionRecipe extends SpecialAdditionRecipe {
 
     @Override
     public boolean testAddition(ItemStack stack) {
-        return stack.is(ModItems.TEA_BAG);
+        return stack.is(ModItems.TEA_BAG) && (TeaTimeUtils.getTeaTypeId(stack).equals(getResultId()));
     }
 
 }

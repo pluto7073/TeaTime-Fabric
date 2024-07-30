@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
 
 public abstract class SpecialAdditionRecipe extends DrinkWorkstationRecipe {
 
-    public SpecialAdditionRecipe(ResourceLocation id) {
-        super(id, Ingredient.EMPTY, Ingredient.EMPTY, "pdapi:empty");
+    public SpecialAdditionRecipe(ResourceLocation id, Ingredient base, Ingredient add, String addin) {
+        super(id, base, add, addin);
     }
 
     @Override
@@ -25,14 +25,6 @@ public abstract class SpecialAdditionRecipe extends DrinkWorkstationRecipe {
 
     @Override
     public abstract boolean matches(Container container, Level level);
-
-    @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public abstract ItemStack craft(Container container);
 
     @Override
     public abstract boolean testBase(ItemStack stack);

@@ -1,7 +1,7 @@
 {
   "changesColor": true,
   "color": 13744201,
-  "onDrinkAdditions": [
+  "onDrinkActions": [
     {
       "type": "teatime:add_tea_effects",
       "tea": "teatime:green_tea"

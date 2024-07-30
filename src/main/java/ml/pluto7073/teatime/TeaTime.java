@@ -38,6 +38,8 @@ import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 public class TeaTime implements ModInitializer {
 
     public static final String MOD_ID = "teatime";
@@ -46,13 +48,12 @@ public class TeaTime implements ModInitializer {
     public static boolean PLUTOSCOFFEEMOD_LOADED = false;
     public static OnDrinkTemplate ADD_TEA_EFFECTS = (id, onDrinkData) -> {
         ResourceLocation teaId = new ResourceLocation(GsonHelper.getAsString(onDrinkData, "tea"));
+        TeaType type = TeaTypes.get(teaId);
+        final List<MobEffectInstance> effects = List.of(type.getEffects());
         return new OnDrink() {
             @Override
             public void onDrink(ItemStack stack, Level level, LivingEntity user) {
-                TeaType type = TeaTypes.get(teaId);
-                for (MobEffectInstance e : type.getEffects()) {
-                    user.addEffect(e);
-                }
+                effects.forEach(user::addEffect);
                 if (user instanceof Player player) player.awardStat(TTStats.DRINK_TEA);
             }
 

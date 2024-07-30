@@ -84,8 +84,17 @@ public final class TeaTimeUtils {
         return TeaTypes.containsId(new ResourceLocation(type)) ? TeaTypes.get(new ResourceLocation(type)) : TeaTypes.EMPTY;
     }
 
+    public static ResourceLocation getTeaTypeId(ItemStack stack) {
+        TeaType type = getTeaType(stack);
+        return TeaTypes.getId(type);
+    }
+
     public static ItemStack setTeaType(ItemStack stack, TeaType type) {
-        stack.getOrCreateTagElement("TeaData").putString("type", TeaTypes.getId(type).toString());
+        return setTeaType(stack, TeaTypes.getId(type));
+    }
+
+    public static ItemStack setTeaType(ItemStack stack, ResourceLocation teaId) {
+        stack.getOrCreateTagElement("TeaData").putString("type", teaId.toString());
         return stack;
     }
 
