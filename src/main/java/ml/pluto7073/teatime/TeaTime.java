@@ -45,7 +45,7 @@ public class TeaTime implements ModInitializer {
     public static final String MOD_ID = "teatime";
     public static final Logger logger = LogManager.getLogger("TeaTime");
     public static ResourceKey<CreativeModeTab> TT_GROUP;
-    public static boolean PLUTOSCOFFEEMOD_LOADED = false;
+
     public static OnDrinkTemplate ADD_TEA_EFFECTS = (id, onDrinkData) -> {
         ResourceLocation teaId = new ResourceLocation(GsonHelper.getAsString(onDrinkData, "tea"));
         TeaType type = TeaTypes.get(teaId);
@@ -69,8 +69,6 @@ public class TeaTime implements ModInitializer {
     @Override
     public void onInitialize() {
         INSTANCE = this;
-        PLUTOSCOFFEEMOD_LOADED = FabricLoader.getInstance().isModLoaded("plutoscoffee");
-        logger.info(PLUTOSCOFFEEMOD_LOADED ? "PlutosCoffeeMod Found!" : "PlutosCoffeeMod does not appear to be loaded");
         ModBlocks.init();
         ModBlockEntityTypes.init();
         ModRecipes.init();

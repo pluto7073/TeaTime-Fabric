@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.networking.packets.s2c.SyncCustomTeaTypesRegistererS2CPacket;
-import ml.pluto7073.teatime.networking.packets.s2c.SyncRollableRecipesRegistryS2CPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
