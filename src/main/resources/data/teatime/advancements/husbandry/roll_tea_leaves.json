@@ -1,0 +1,33 @@
+{
+  "display": {
+    "icon": {
+      "item": "teatime:rolled_tea_leaves"
+    },
+    "title": "Rolling in the Deep",
+    "description": "Roll some tea leaves on a workstation",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "teatime:husbandry/wither_tea_leaves",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "teatime:rolled_tea_leaves"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

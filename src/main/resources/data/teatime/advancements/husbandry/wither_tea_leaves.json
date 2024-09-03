@@ -1,0 +1,33 @@
+{
+  "display": {
+    "icon": {
+      "item": "teatime:withered_tea_leaves"
+    },
+    "title": "The Wither?",
+    "description": "Wither some tea leaves in an item frame",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "teatime:husbandry/plant_tea_seeds",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "teatime:withered_tea_leaves"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "requirement"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

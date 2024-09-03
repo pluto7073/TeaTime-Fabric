@@ -12,13 +12,11 @@ import java.util.Map;
 
 public class TeaType {
 
-    public static final Map<ResourceLocation, TeaType> TYPES = new HashMap<>();
-
     final ResourceLocation id;
-    private final List<Item> ingredients;
-    private final int colour;
-    private final int caffeine;
-    private final MobEffectInstance[] effects;
+    protected final List<Item> ingredients;
+    protected final int colour;
+    protected final int caffeine;
+    protected final MobEffectInstance[] effects;
 
     public TeaType(ResourceLocation id, int colour, List<Item> ingredients, int caffeine, MobEffectInstance... effects) {
         this.colour = colour;
@@ -37,8 +35,8 @@ public class TeaType {
     }
 
     public String getTranslationKey() {
-        ResourceLocation id = TeaTypes.getId(this);
-        return "teatype." + id.getNamespace() + "." + id.getPath();
+        ResourceLocation id = TeaTypeManager.getId(this);
+        return id.toLanguageKey("teatype");
     }
 
     public int getCaffeine() {
@@ -49,10 +47,10 @@ public class TeaType {
         return effects;
     }
 
-    public JsonObject getAsJson() {
+    public JsonObject toJson() {
         JsonObject object = new JsonObject();
-        object.add("parent", new JsonPrimitive(TeaTypes.getId(this).toString()));
-        object.add("isParent", new JsonPrimitive(true));
+        object.addProperty("parent", TeaTypeManager.getId(this).toString());
+        object.addProperty("isParent", true);
         return object;
     }
 

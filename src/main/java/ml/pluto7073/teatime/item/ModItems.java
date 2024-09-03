@@ -15,11 +15,11 @@ public class ModItems {
     public static final Item WITHERED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item WHITE_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item STEAMED_TEA_LEAVES = new Item(new Item.Properties());
-    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeaves(new Item.Properties());
+    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeavesItem(new Item.Properties());
     public static final Item FERMENTED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item DRIED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item TEA_BAG = new TeaBagItem(new Item.Properties());
-    public static final Item TEA = new Tea(new Item.Properties());
+    public static final Item TEA = new TeaItem(new Item.Properties().stacksTo(1));
     public static final Item TEA_SEEDS = new ItemNameBlockItem(ModBlocks.TEA_SHRUB, new Item.Properties());
     public static final Item STEAMER = new BlockItem(ModBlocks.STEAMER, new Item.Properties());
 

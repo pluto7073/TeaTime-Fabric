@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "item": "teatime:tea",
+      "nbt": "{TeaData:{type:\"teatime:black_tea\"},Enchantments:[{id:\"unbreaking\",lvl:1}]}"
+    },
+    "title": "A High Class Drink",
+    "description": "Drink a tea with 5 Diamonds and a Netherite Ingot",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "teatime:husbandry/roll_tea_leaves",
+  "criteria": {
+    "drank": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "teatime:tea"
+          ],
+          "nbt": "{DrinkData:{Additions:[\"pdapi:diamond\",\"pdapi:diamond\",\"pdapi:diamond\",\"pdapi:diamond\",\"pdapi:diamond\",\"pdapi:netherite\"]}}"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "drank"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

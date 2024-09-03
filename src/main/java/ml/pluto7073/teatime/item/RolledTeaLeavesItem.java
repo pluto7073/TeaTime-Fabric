@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class RolledTeaLeaves extends Item {
+public class RolledTeaLeavesItem extends Item {
 
-    public RolledTeaLeaves(Properties settings) {
+    public RolledTeaLeavesItem(Properties settings) {
         super(settings);
     }
 

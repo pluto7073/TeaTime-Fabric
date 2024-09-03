@@ -1,8 +1,7 @@
 package ml.pluto7073.teatime.networking;
 
-import ml.pluto7073.teatime.event.CustomTeaTypesRegisterer;
 import ml.pluto7073.teatime.networking.packets.s2c.SyncCustomTeaTypesRegistererS2CPacket;
-import ml.pluto7073.teatime.teatypes.TeaTypes;
+import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -24,14 +23,14 @@ public class TTPacketsS2C {
 
     @Environment(EnvType.CLIENT)
     private static void receiveCustomTeaTypesList(SyncCustomTeaTypesRegistererS2CPacket packet, LocalPlayer player, PacketSender sender) {
-        TeaTypes.resetRegistry();
+        TeaTypeManager.resetRegistry();
 
         packet.teaTypes().entrySet().stream()
-                .filter(entry -> !TeaTypes.containsId(entry.getKey()))
+                .filter(entry -> !TeaTypeManager.containsId(entry.getKey()))
                 .map(entry -> new AbstractMap.SimpleEntry<>(
-                        entry.getKey(), CustomTeaTypesRegisterer.loadFromJson(entry.getKey(), entry.getValue())
+                        entry.getKey(), TeaTypeManager.loadFromJson(entry.getKey(), entry.getValue())
                 ))
-                .forEach(entry -> TeaTypes.register(entry.getKey(), entry.getValue()));
+                .forEach(entry -> TeaTypeManager.register(entry.getKey(), entry.getValue()));
     }
 
 }

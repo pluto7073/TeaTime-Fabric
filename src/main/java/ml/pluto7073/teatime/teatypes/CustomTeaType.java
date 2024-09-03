@@ -11,6 +11,8 @@ import java.util.List;
 public class CustomTeaType extends TeaType {
 
     private final JsonObject data;
+    private final TeaType parent;
+
     public CustomTeaType(ResourceLocation id, TeaType base, int color, List<Item> ingredients, List<MobEffectInstance> effects, JsonObject data) {
         super(id, color, TeaTimeUtils.create(() -> {
             ingredients.addAll(base.getIngredients());
@@ -20,10 +22,15 @@ public class CustomTeaType extends TeaType {
             return effects.toArray(new MobEffectInstance[0]);
         }));
         this.data = data;
+        this.parent = base;
+    }
+
+    public TeaType parent() {
+        return parent;
     }
 
     @Override
-    public JsonObject getAsJson() {
+    public JsonObject toJson() {
         return data;
     }
 }

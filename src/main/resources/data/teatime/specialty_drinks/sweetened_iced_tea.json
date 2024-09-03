@@ -1,0 +1,28 @@
+{
+  "type": "teatime:tea_base_specialty_drink",
+  "tea": "teatime:black_tea",
+  "additions": [
+    "pdapi:ice",
+    "pdapi:honey",
+    "pdapi:sugar",
+    "pdapi:sugar"
+  ],
+  "color": 5647619,
+  "onDrinkActions": [
+    {
+      "type": "pdapi:restore_hunger",
+      "food": 3,
+      "saturation": 4
+    },
+    {
+      "type": "teatime:add_tea_effects",
+      "tea": "teatime:black_tea"
+    },
+    {
+      "type": "pdapi:apply_status_effect",
+      "effect": "minecraft:regeneration",
+      "duration": 200,
+      "amplifier": 1
+    }
+  ]
+}

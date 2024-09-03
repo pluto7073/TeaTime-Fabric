@@ -18,7 +18,7 @@
   "itemGroup.teatime.tt_group": "Tea Time Items",
   "container.steamer": "Steamer",
   "rolled_will_create.teatime.title": "Will Create When Dried",
-  "tooltip.teatime.one_x": "1 x ",
+  "tooltip.teatime.one_x": "1x ",
   "teatype.teatime.empty": "No Tea Type",
   "teatype.teatime.herbal_tea": "Herbal Tea",
   "teatype.teatime.white_tea": "White Tea",
@@ -39,5 +39,8 @@
   "drink_addition.teatime.lucky_tea": "Lucky Tea Bag",
   "drink_addition.teatime.meditation_tea": "Meditation Tea Bag",
   "drink_addition.teatime.rose_tea": "Rose Tea Bag",
-  "drink_addition.teatime.withered_tea": "Withered Tea Bag"
+  "drink_addition.teatime.withered_tea": "Withered Tea Bag",
+  "drink_addition.teatime.echo_sight": "Echo Sight",
+  "drink.teatime.tea_of_great_escape": "Tea of Great Escape",
+  "drink.teatime.sweetened_iced_tea": "Sweetened Iced Tea"
 }

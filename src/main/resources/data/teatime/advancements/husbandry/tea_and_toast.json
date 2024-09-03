@@ -1,0 +1,41 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:bread"
+    },
+    "title": "Tea and Toast",
+    "description": "Have some tea and toast with friends",
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "teatime:husbandry/roll_tea_leaves",
+  "criteria": {
+    "has_bread": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "player": {
+          "equipment": {
+            "offhand": {
+              "items": [
+                "minecraft:bread"
+              ]
+            },
+            "mainhand": {
+              "items": [
+                "teatime:tea"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_bread"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

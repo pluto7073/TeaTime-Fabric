@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "item": "teatime:tea_seeds"
+    },
+    "title": "Spill That Tea!",
+    "description": "Plant some tea seeds",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "minecraft:husbandry/plant_seed",
+  "criteria": {
+    "tea_plant": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:block_state_property",
+            "block": "teatime:tea_shrub",
+            "properties": {}
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "tea_plant"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

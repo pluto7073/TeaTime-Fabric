@@ -1,10 +1,8 @@
 package ml.pluto7073.teatime.recipe;
 
-import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.item.ModItems;
-import ml.pluto7073.teatime.tags.ModItemTags;
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypes;
+import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.RegistryAccess;
@@ -35,7 +33,7 @@ public class TeaBagRecipe extends CustomRecipe {
         if (!items.contains(Items.STRING) || !items.contains(Items.PAPER)) return false;
         items.remove(Items.PAPER);
         items.remove(Items.STRING);
-        return TeaTypes.getFromIngredients(items) != TeaTypes.EMPTY;
+        return TeaTypeManager.getFromIngredients(items) != TeaTypeManager.EMPTY;
     }
 
     @Override
@@ -44,8 +42,8 @@ public class TeaBagRecipe extends CustomRecipe {
         ingredients.remove(Items.PAPER);
         ingredients.remove(Items.STRING);
         ItemStack teaBag = new ItemStack(ModItems.TEA_BAG, 1);
-        TeaType teaType = TeaTypes.getFromIngredients(ingredients);
-        if (teaType == TeaTypes.EMPTY) {
+        TeaType teaType = TeaTypeManager.getFromIngredients(ingredients);
+        if (teaType == TeaTypeManager.EMPTY) {
             throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(BuiltInRegistries.ITEM::getId).toList());
         }
         return TeaTimeUtils.setTeaType(teaBag, teaType);

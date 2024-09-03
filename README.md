@@ -2,7 +2,10 @@
 
 Spill that tea with Pluto's Tea Time
 
-With this installment of the Pluto's Drinks series, you can embark on the long and complicated process of creating Tea in Minecraft.  This mod, while not entirely 100% realistic to the actual process, is very similar to creating tea in real life!
+With this installment of the Pluto's Drinks series, you can embark on the long and 
+complicated process of creating Tea in Minecraft.  Enjoy such activities as growing 
+tea leaves, wilting and fermenting tea leaves, and creating various types of tea 
+with numerous beneficial effects.
 
 ### Want More Drinks?
 Check out the entire Pluto's Drinks collection [here](https://modrinth.com/collection/n9TVye64)!
@@ -20,7 +23,7 @@ Check out the entire Pluto's Drinks collection [here](https://modrinth.com/colle
 - If Pluto's Coffee Mod is also installed, Tea can be used in lattes to create a Tea Latte
 - Tea will offer a little hydration in the [Dehydration](https://www.curseforge.com/minecraft/mc-mods/dehydration) mod
 
-### A wiki for the tea process is coming soon...
+### The Tea Making process will be added to the Pluto's Drinks wiki soon
 
 ### Forge Version?
-Not planned, if you wanna make one go ahead as long as you inform and credit me
+Not planned, I don't have the time or motivation to learn a whole new modloader.

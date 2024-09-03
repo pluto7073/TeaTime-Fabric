@@ -1,7 +1,6 @@
 package ml.pluto7073.teatime.item;
 
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypes;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

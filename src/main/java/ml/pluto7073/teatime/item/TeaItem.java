@@ -3,7 +3,7 @@ package ml.pluto7073.teatime.item;
 import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypes;
+import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -20,17 +20,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
-public class Tea extends AbstractCustomizableDrinkItem {
+public class TeaItem extends AbstractCustomizableDrinkItem {
 
     private static final int MAX_USE_TIME = 32;
 
-    public Tea(Properties settings) {
+    public TeaItem(Properties settings) {
         super(Items.GLASS_BOTTLE, Temperature.HOT, settings);
     }
 
     @Override
     public ItemStack getDefaultInstance() {
-        return TeaTimeUtils.setTeaType(super.getDefaultInstance(), TeaTypes.EMPTY);
+        return TeaTimeUtils.setTeaType(super.getDefaultInstance(), TeaTypeManager.EMPTY);
     }
 
     @Override
@@ -59,8 +59,10 @@ public class Tea extends AbstractCustomizableDrinkItem {
     }
 
     @Override
-    public int getCaffeineContent(ItemStack stack) {
-        return TeaTimeUtils.getTeaType(stack).getCaffeine() + super.getCaffeineContent(stack);
+    public int getChemicalContent(String name, ItemStack stack) {
+        if (!"caffeine".equals(name)) return super.getChemicalContent(name, stack);
+        int fromAdditions = super.getChemicalContent(name, stack);
+        fromAdditions += TeaTimeUtils.getTeaType(stack).getCaffeine();
+        return fromAdditions;
     }
-
 }

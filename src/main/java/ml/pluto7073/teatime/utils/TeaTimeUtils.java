@@ -1,11 +1,10 @@
 package ml.pluto7073.teatime.utils;
 
-import ml.pluto7073.pdapi.DrinkUtil;
+import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.pdapi.addition.DrinkAddition;
-import ml.pluto7073.pdapi.addition.DrinkAdditions;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypes;
+import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -35,9 +34,9 @@ public final class TeaTimeUtils {
     public static List<ItemStack> getTeaBags() {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack stack = new ItemStack(ModItems.TEA_BAG);
-        for (ResourceLocation i : TeaTypes.getIds()) {
+        for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(stack.copy(), TeaTypes.get(i)));
+            stacks.add(setTeaType(stack.copy(), TeaTypeManager.get(i)));
         }
         return stacks;
     }
@@ -45,9 +44,9 @@ public final class TeaTimeUtils {
     public static List<ItemStack> getTea() {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack tea = new ItemStack(ModItems.TEA, 1);
-        for (ResourceLocation i : TeaTypes.getIds()) {
+        for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(tea.copy(), TeaTypes.get(i)));
+            stacks.add(setTeaType(tea.copy(), TeaTypeManager.get(i)));
         }
         return stacks;
     }
@@ -81,16 +80,16 @@ public final class TeaTimeUtils {
 
     public static TeaType getTeaType(CompoundTag teaData) {
         String type = teaData.contains("type") ? teaData.getString("type") : "teatime:empty";
-        return TeaTypes.containsId(new ResourceLocation(type)) ? TeaTypes.get(new ResourceLocation(type)) : TeaTypes.EMPTY;
+        return TeaTypeManager.containsId(new ResourceLocation(type)) ? TeaTypeManager.get(new ResourceLocation(type)) : TeaTypeManager.EMPTY;
     }
 
     public static ResourceLocation getTeaTypeId(ItemStack stack) {
         TeaType type = getTeaType(stack);
-        return TeaTypes.getId(type);
+        return TeaTypeManager.getId(type);
     }
 
     public static ItemStack setTeaType(ItemStack stack, TeaType type) {
-        return setTeaType(stack, TeaTypes.getId(type));
+        return setTeaType(stack, TeaTypeManager.getId(type));
     }
 
     public static ItemStack setTeaType(ItemStack stack, ResourceLocation teaId) {
