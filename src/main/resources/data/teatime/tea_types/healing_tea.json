@@ -4,7 +4,11 @@
     "minecraft:glistering_melon_slice"
   ],
   "effects": [
-    "minecraft:regeneration"
+    {
+      "effect": "minecraft:regeneration",
+      "duration": 600,
+      "amplifier": 0
+    }
   ],
   "color": 13719422
 }

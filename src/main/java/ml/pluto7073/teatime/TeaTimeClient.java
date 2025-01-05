@@ -4,7 +4,7 @@ import ml.pluto7073.teatime.block.ModBlocks;
 import ml.pluto7073.teatime.gui.SteamerScreen;
 import ml.pluto7073.teatime.gui.handlers.TTMenuTypes;
 import ml.pluto7073.teatime.item.ModItems;
-import ml.pluto7073.teatime.networking.TTPacketsS2C;
+import ml.pluto7073.teatime.networking.ClientboundTTPackets;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -19,7 +19,7 @@ public class TeaTimeClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        TTPacketsS2C.register();
+        ClientboundTTPackets.register();
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> tintIndex > 0 ? -1 : TeaTimeUtils.getTeaColor(stack), ModItems.TEA);
         MenuScreens.register(TTMenuTypes.STEAMER_MENU_TYPE, SteamerScreen::new);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TEA_SHRUB, RenderType.cutout());

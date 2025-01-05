@@ -8,6 +8,7 @@ import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,8 +22,6 @@ import java.util.List;
 
 @MethodsReturnNonnullByDefault
 public class TeaItem extends AbstractCustomizableDrinkItem {
-
-    private static final int MAX_USE_TIME = 32;
 
     public TeaItem(Properties settings) {
         super(Items.GLASS_BOTTLE, Temperature.HOT, settings);
@@ -59,9 +58,10 @@ public class TeaItem extends AbstractCustomizableDrinkItem {
     }
 
     @Override
-    public int getChemicalContent(String name, ItemStack stack) {
-        if (!"caffeine".equals(name)) return super.getChemicalContent(name, stack);
-        int fromAdditions = super.getChemicalContent(name, stack);
+    public float getChemicalContent(ResourceLocation name, ItemStack stack) {
+        if (!"pdapi:caffeine".equals(name.toString()))
+            return super.getChemicalContent(name, stack);
+        float fromAdditions = super.getChemicalContent(name, stack);
         fromAdditions += TeaTimeUtils.getTeaType(stack).getCaffeine();
         return fromAdditions;
     }

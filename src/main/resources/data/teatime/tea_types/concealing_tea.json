@@ -5,7 +5,11 @@
     "minecraft:fermented_spider_eye"
   ],
   "effects": [
-    "minecraft:invisibility"
+    {
+      "effect": "minecraft:invisibility",
+      "duration": 600,
+      "amplifier": 0
+    }
   ],
   "color": 13195217
 }

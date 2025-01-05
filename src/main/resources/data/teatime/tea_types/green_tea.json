@@ -1,0 +1,15 @@
+{
+  "color": 13744201,
+  "ingredients": [
+    "teatime:dried_tea_leaves"
+  ],
+  "caffeine": 30,
+  "effects": [
+    {
+      "effect": "minecraft:haste",
+      "duration": 600,
+      "amplifier": 0
+    }
+  ],
+  "internal": true
+}

@@ -1,6 +1,8 @@
 {
-  "type": "teatime:tea_base_specialty_drink",
-  "tea": "teatime:black_tea",
+  "base": {
+    "type": "teatime:tea",
+    "tea": "teatime:black_tea"
+  },
   "additions": [
     "pdapi:ice",
     "pdapi:honey",
@@ -24,5 +26,8 @@
       "duration": 200,
       "amplifier": 1
     }
-  ]
+  ],
+  "chemicals": {
+    "pdapi:caffeine": 50
+  }
 }

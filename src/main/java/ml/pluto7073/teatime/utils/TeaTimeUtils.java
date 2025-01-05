@@ -1,12 +1,17 @@
 package ml.pluto7073.teatime.utils;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.pdapi.addition.DrinkAddition;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -20,6 +25,12 @@ public final class TeaTimeUtils {
 
     public static final Map<String, Item> DRYING_RESULTS = new HashMap<>();
     public static final int MAX_TIME_DRYING = 200;
+    public static final Codec<MobEffectInstance> MOB_EFFECT_CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(BuiltInRegistries.MOB_EFFECT.byNameCodec().fieldOf("effect")
+                                .forGetter(MobEffectInstance::getEffect),
+                            Codec.INT.fieldOf("duration").forGetter(MobEffectInstance::getDuration),
+                            Codec.INT.fieldOf("amplifier").forGetter(MobEffectInstance::getAmplifier))
+                    .apply(instance, MobEffectInstance::new));
 
     public static List<ItemStack> getRolledLeaves() {
         List<ItemStack> stacks = new ArrayList<>();
@@ -80,7 +91,7 @@ public final class TeaTimeUtils {
 
     public static TeaType getTeaType(CompoundTag teaData) {
         String type = teaData.contains("type") ? teaData.getString("type") : "teatime:empty";
-        return TeaTypeManager.containsId(new ResourceLocation(type)) ? TeaTypeManager.get(new ResourceLocation(type)) : TeaTypeManager.EMPTY;
+        return TeaTypeManager.containsId(new ResourceLocation(type)) ? TeaTypeManager.get(new ResourceLocation(type)) : TeaTypeManager.EMPTY_TYPE;
     }
 
     public static ResourceLocation getTeaTypeId(ItemStack stack) {
@@ -95,6 +106,10 @@ public final class TeaTimeUtils {
     public static ItemStack setTeaType(ItemStack stack, ResourceLocation teaId) {
         stack.getOrCreateTagElement("TeaData").putString("type", teaId.toString());
         return stack;
+    }
+
+    public static ItemStack setTeaType(ItemStack stack, ResourceKey<TeaType> id) {
+        return setTeaType(stack, id.location());
     }
 
     public static <T> T create(Supplier<T> supplier) {

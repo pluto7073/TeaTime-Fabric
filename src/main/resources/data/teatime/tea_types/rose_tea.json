@@ -4,6 +4,10 @@
     "minecraft:rose_bush"
   ],
   "effects": [
-    "minecraft:instant_health"
+    {
+      "effect": "minecraft:instant_health",
+      "duration": 600,
+      "amplifier": 0
+    }
   ]
 }

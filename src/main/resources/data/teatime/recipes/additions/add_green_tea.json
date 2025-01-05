@@ -1,12 +1,4 @@
 {
   "type": "teatime:drink_workstation_special_teainlatte",
-  "tea": "teatime:green_tea",
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "plutoscoffee"
-      ]
-    }
-  ]
+  "tea": "teatime:green_tea"
 }

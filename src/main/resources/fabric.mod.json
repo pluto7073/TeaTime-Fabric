@@ -23,6 +23,9 @@
     ],
     "client": [
       "ml.pluto7073.teatime.TeaTimeClient"
+    ],
+    "rei_client": [
+      "ml.pluto7073.teatime.compat.rei.TeaREI"
     ]
   },
   "mixins": [
@@ -42,13 +45,10 @@
   },
 
   "depends": {
-    "fabricloader": ">=0.15.7",
+    "fabricloader": ">=0.16.5",
     "fabric-api": "*",
     "minecraft": "~1.20.1",
     "java": ">=17",
-    "pdapi": "=0.2.x"
-  },
-  "suggests": {
-    "another-mod": "*"
+    "pdapi": "0.3.x"
   }
 }

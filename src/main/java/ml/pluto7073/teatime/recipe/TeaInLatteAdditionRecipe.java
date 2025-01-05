@@ -1,5 +1,6 @@
 package ml.pluto7073.teatime.recipe;
 
+import ml.pluto7073.pdapi.tag.PDTags;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.recipe.special.SpecialAdditionRecipe;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.Level;
 public class TeaInLatteAdditionRecipe extends SpecialAdditionRecipe {
 
     public TeaInLatteAdditionRecipe(ResourceLocation id, ResourceLocation teaType) {
-        super(id, Ingredient.of(BuiltInRegistries.ITEM.get(new ResourceLocation("plutoscoffee:latte"))),
+        super(id, Ingredient.of(PDTags.WORKSTATION_DRINKS),
                 Ingredient.of(TeaTimeUtils.setTeaType(new ItemStack(ModItems.TEA_BAG), teaType)), teaType.toString());
     }
 

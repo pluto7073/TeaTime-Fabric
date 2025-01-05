@@ -4,7 +4,11 @@
     "minecraft:rabbit_foot"
   ],
   "effects": [
-    "minecraft:luck"
+    {
+      "effect": "minecraft:luck",
+      "duration": 600,
+      "amplifier": 0
+    }
   ],
   "color": 2973733
 }

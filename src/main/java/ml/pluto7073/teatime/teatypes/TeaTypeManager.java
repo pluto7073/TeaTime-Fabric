@@ -1,22 +1,26 @@
 package ml.pluto7073.teatime.teatypes;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
+import com.mojang.serialization.JsonOps;
 import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.item.ModItems;
-import ml.pluto7073.teatime.networking.packets.s2c.SyncCustomTeaTypesRegistererS2CPacket;
+import ml.pluto7073.teatime.networking.packets.clientbound.ClientboundSyncCustomTeaTypesPacket;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -31,27 +35,31 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
 
     public static final ResourceLocation PHASE = TeaTime.asId("phase/tea_types");
 
-    private static final Map<ResourceLocation, TeaType> REGISTRY = new HashMap<>();
-    private static final Map<ResourceLocation, TeaType> DEFAULT_REGISTRY = new HashMap<>();
+    public static final ResourceKey<Registry<TeaType>> TEA_TYPE =
+            ResourceKey.createRegistryKey(TeaTime.asId("tea_type"));
 
-    public static final TeaType EMPTY;
-    public static final TeaType HERBAL_TEA;
-    public static final TeaType WHITE_TEA;
-    public static final TeaType GREEN_TEA;
-    public static final TeaType BLACK_TEA;
+    public static final ResourceKey<TeaType> EMPTY = baseType("empty");
+    public static final ResourceKey<TeaType> HERBAL_TEA = baseType("herbal_tea");
+    public static final ResourceKey<TeaType> WHITE_TEA = baseType("white_tea");
+    public static final ResourceKey<TeaType> GREEN_TEA = baseType("green_tea");
+    public static final ResourceKey<TeaType> BLACK_TEA = baseType("black_tea");
+
+    private static final Map<ResourceLocation, TeaType> REGISTRY = new HashMap<>();
+
+    public static final TeaType EMPTY_TYPE = new TeaType(Optional.empty(), 0,
+            List.of(), 0, List.of(), true, "");
 
     public TeaTypeManager() {
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(PHASE, (player, joined) -> TeaTypeManager.send(player));
     }
 
-    public static TeaType register(ResourceLocation id, TeaType teaType) {
-        REGISTRY.put(id, teaType);
-        DEFAULT_REGISTRY.put(id, teaType);
-        return teaType;
+    private static ResourceKey<TeaType> baseType(String id) {
+        return ResourceKey.create(TEA_TYPE, TeaTime.asId(id));
     }
 
-    private static TeaType register(String id, TeaType type) {
-        return register(TeaTime.asId(id), type);
+    public static TeaType register(ResourceLocation id, TeaType teaType) {
+        REGISTRY.put(id, teaType);
+        return teaType;
     }
 
     public static TeaType getFromIngredients(List<Item> stacks) {
@@ -65,22 +73,24 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
             }
             if (wantedItems.isEmpty()) return type;
         }
-        return EMPTY;
+        return EMPTY_TYPE;
+    }
+
+    public static TeaType get(ResourceKey<TeaType> key) {
+        return get(key.location());
     }
 
     public static TeaType get(ResourceLocation id) {
         if (!REGISTRY.containsKey(id)) {
-            throw new IllegalArgumentException("No tea type with registered with id " + id);
+            return EMPTY_TYPE;
         }
         return REGISTRY.get(id);
     }
 
     public static void send(ServerPlayer player) {
 
-        Map<ResourceLocation, JsonObject> types = new HashMap<>();
-        REGISTRY.forEach((identifier, type) -> types.put(identifier, type.toJson()));
-
-        ServerPlayNetworking.send(player, new SyncCustomTeaTypesRegistererS2CPacket(types));
+        ServerPlayNetworking.send(player,
+                new ClientboundSyncCustomTeaTypesPacket(ImmutableMap.copyOf(REGISTRY)));
 
     }
 
@@ -95,7 +105,7 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
                 return i;
             }
         }
-        return TeaTime.asId("empty");
+        return new ResourceLocation("empty");
     }
 
     public static Set<ResourceLocation> getIds() {
@@ -111,16 +121,15 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
         List<ResourceLocation> miscTeas = new ArrayList<>();
         for (ResourceLocation id : allIds) {
             TeaType type = get(id);
-            if (type == EMPTY || type == HERBAL_TEA || type == WHITE_TEA
-                    || type == GREEN_TEA || type == BLACK_TEA) continue;
-            if (!(type instanceof CustomTeaType custom)) {
+            if (type.internal()) continue;
+            if (type.parent().isEmpty()) {
                 miscTeas.add(id);
                 continue;
             }
-            if (custom.parent() == HERBAL_TEA) herbalTeas.add(id);
-            else if (custom.parent() == WHITE_TEA) whiteTeas.add(id);
-            else if (custom.parent() == GREEN_TEA) greenTeas.add(id);
-            else if (custom.parent() == BLACK_TEA) blackTeas.add(id);
+            if (type.parent().equals(Optional.of(HERBAL_TEA))) herbalTeas.add(id);
+            else if (type.parent().equals(Optional.of(WHITE_TEA))) whiteTeas.add(id);
+            else if (type.parent().equals(Optional.of(GREEN_TEA))) greenTeas.add(id);
+            else if (type.parent().equals(Optional.of(BLACK_TEA))) blackTeas.add(id);
             else miscTeas.add(id);
         }
         Comparator<ResourceLocation> comparator = DrinkUtil.alphabetizer(ResourceLocation::toString);
@@ -129,32 +138,26 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
         greenTeas.sort(comparator);
         blackTeas.sort(comparator);
         miscTeas.sort(comparator);
-        whiteTeas.add(0, TeaTime.asId("white_tea"));
-        greenTeas.add(0, TeaTime.asId("green_tea"));
-        blackTeas.add(0, TeaTime.asId("black_tea"));
+        whiteTeas.add(0, WHITE_TEA.location());
+        greenTeas.add(0, GREEN_TEA.location());
+        blackTeas.add(0, BLACK_TEA.location());
         return Streams.concat(herbalTeas.stream(), whiteTeas.stream(), greenTeas.stream(), blackTeas.stream())
                 .toList();
+    }
+
+    public static List<TeaType> values() {
+        return REGISTRY.values().stream().toList();
     }
 
     public static void init() {}
 
     public static void resetRegistry() {
         REGISTRY.clear();
-        REGISTRY.putAll(DEFAULT_REGISTRY);
-    }
-
-    static {
-        EMPTY = register("empty", new TeaType(TeaTime.asId("empty"), 0xFFFFFF, List.of(), 0));
-        HERBAL_TEA = register("herbal_tea", new TeaType(TeaTime.asId("herbal_tea"), 0xf7e48f, List.of(), 0));
-        WHITE_TEA = register("white_tea", new TeaType(TeaTime.asId("white_tea"), 0xf7e48f, List.of(ModItems.WHITE_TEA_LEAVES), 10));
-        GREEN_TEA = register("green_tea", new TeaType(TeaTime.asId("green_tea"), 0xd1b849, List.of(ModItems.DRIED_TEA_LEAVES), 30, new MobEffectInstance(MobEffects.DIG_SPEED, 20 * 60)));
-        BLACK_TEA = register("black_tea", new TeaType(TeaTime.asId("black_tea"), 0x4d0705, List.of(ModItems.FERMENTED_TEA_LEAVES), 50, new MobEffectInstance(MobEffects.DIG_SPEED, 20 * 60),
-                new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20 * 60)));
     }
 
     @Override
     public ResourceLocation getFabricId() {
-        return TeaTime.asId("custom_tea_types_registerer");
+        return TeaTime.asId("tea_type_registerer");
     }
 
     @Override
@@ -163,15 +166,27 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
 
         int i = 0;
 
-        for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources("custom_tea_types", id -> id.getPath().endsWith(".json")).entrySet()) {
+        for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources("tea_types", id -> id.getPath().endsWith(".json")).entrySet()) {
             ResourceLocation id = new ResourceLocation(entry.getKey().getNamespace(),
                     entry.getKey().getPath()
-                            .replace("custom_tea_types/", "")
+                            .replace("tea_types/", "")
                             .replace(".json", ""));
 
             try (InputStream stream = entry.getValue().open()) {
                 JsonObject object = GsonHelper.parse(new InputStreamReader(stream));
-                TeaTypeManager.register(id, loadFromJson(id, object));
+
+                if (object.has("fabric:load_conditions")) {
+                    boolean b = ResourceConditions.conditionsMatch(
+                            GsonHelper.getAsJsonArray(object, "fabric:load_conditions"),
+                            true
+                    );
+
+                    if (!b) continue;
+                }
+
+                TeaTypeManager.register(id, TeaType.CODEC.parse(JsonOps.INSTANCE, object).getOrThrow(false, s -> {
+                    throw new JsonSyntaxException(s);
+                }));
                 i++;
             } catch (Exception e) {
                 TeaTime.logger.error("Could not load custom tea type {}", id, e);
@@ -181,57 +196,4 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
         TeaTime.logger.info("Loaded {} custom tea types", i);
     }
 
-    public static TeaType loadFromJson(ResourceLocation id, JsonObject object) {
-        if (object.has("isParent")) {
-            if (GsonHelper.getAsBoolean(object, "isParent")) return TeaTypeManager.get(new ResourceLocation(GsonHelper.getAsString(object, "parent")));
-        }
-
-        TeaType parent = TeaTypeManager.get(new ResourceLocation(GsonHelper.getAsString(object, "parent")));
-
-        List<Item> ingredients = new ArrayList<>();
-
-        if (object.has("ingredients")) {
-            JsonArray ingArr = GsonHelper.getAsJsonArray(object, "ingredients");
-
-            for (JsonElement e : ingArr) {
-                if (!e.isJsonPrimitive()) {
-                    TeaTime.logger.warn("Non String value in ingredients list");
-                    continue;
-                }
-                JsonPrimitive prim = e.getAsJsonPrimitive();
-                String s = prim.getAsString();
-                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(s));
-                if (item == null) throw new IllegalArgumentException(s + " is not a valid item id");
-                ingredients.add(item);
-            }
-        }
-
-        List<MobEffectInstance> effects = new ArrayList<>();
-
-        if (object.has("effects")) {
-            JsonArray ingArr = GsonHelper.getAsJsonArray(object, "effects");
-
-            for (JsonElement e : ingArr) {
-                if (!e.isJsonPrimitive()) {
-                    TeaTime.logger.warn("Non String value in effects list");
-                    continue;
-                }
-                JsonPrimitive prim = e.getAsJsonPrimitive();
-                String s = prim.getAsString();
-                MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(s));
-                if (effect == null) throw new IllegalArgumentException(s + " is not a valid status effect");
-                if (effect.isInstantenous()) {
-                    effects.add(new MobEffectInstance(effect, 1, 0));
-                } else effects.add(new MobEffectInstance(effect, 60 * 20, 0));
-            }
-        }
-
-        int color = parent.getColour();
-
-        if (object.has("color")) {
-            color = GsonHelper.getAsInt(object, "color");
-        }
-
-        return new CustomTeaType(id, parent, color, ingredients, effects, object);
-    }
 }

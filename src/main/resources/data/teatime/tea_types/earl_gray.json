@@ -1,0 +1,14 @@
+{
+  "parent": "teatime:black_tea",
+  "ingredients": [
+    "fruitfulfun:orange"
+  ],
+  "effects": [
+    {
+      "effect": "minecraft:saturation",
+      "duration": 600,
+      "amplifier": 0
+    }
+  ],
+  "color": 12877105
+}

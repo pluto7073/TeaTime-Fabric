@@ -1,12 +1,4 @@
 {
   "type": "teatime:drink_workstation_special_teainlatte",
-  "tea": "teatime:black_tea",
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "plutoscoffee"
-      ]
-    }
-  ]
+  "tea": "teatime:black_tea"
 }

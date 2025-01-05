@@ -1,11 +1,15 @@
 package ml.pluto7073.teatime.action;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.addition.action.OnDrinkAction;
 import ml.pluto7073.pdapi.addition.action.OnDrinkSerializer;
+import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,15 +21,15 @@ import java.util.List;
 
 public class AddTeaEffectsAction implements OnDrinkAction {
 
-    private final TeaType type;
+    private final ResourceKey<TeaType> type;
 
-    public AddTeaEffectsAction(TeaType type) {
+    public AddTeaEffectsAction(ResourceKey<TeaType> type) {
         this.type = type;
     }
 
     @Override
     public void onDrink(ItemStack stack, Level level, LivingEntity user) {
-        List<MobEffectInstance> list = List.of(type.getEffects());
+        List<MobEffectInstance> list = TeaTypeManager.get(type).getEffects();
         list.forEach(user::addEffect);
     }
 
@@ -36,29 +40,24 @@ public class AddTeaEffectsAction implements OnDrinkAction {
 
     public static class Serializer implements OnDrinkSerializer<AddTeaEffectsAction> {
 
-        @Override
-        public AddTeaEffectsAction fromJson(JsonObject json) {
-            ResourceLocation id = new ResourceLocation(GsonHelper.getAsString(json, "tea"));
-            TeaType type = TeaTypeManager.get(id);
-            return new AddTeaEffectsAction(type);
-        }
+        public static final Codec<AddTeaEffectsAction> CODEC = RecordCodecBuilder.create(instance ->
+                instance.group(ResourceKey.codec(TeaTypeManager.TEA_TYPE).fieldOf("tea")
+                                .forGetter(a -> a.type))
+                        .apply(instance, AddTeaEffectsAction::new));
 
         @Override
-        public void toJson(JsonObject json, AddTeaEffectsAction action) {
-            ResourceLocation id = TeaTypeManager.getId(action.type);
-            json.addProperty("tea", id.toString());
+        public Codec<AddTeaEffectsAction> codec() {
+            return CODEC;
         }
 
         @Override
         public AddTeaEffectsAction fromNetwork(FriendlyByteBuf buf) {
-            TeaType type = TeaTypeManager.get(buf.readResourceLocation());
-            return new AddTeaEffectsAction(type);
+            return new AddTeaEffectsAction(buf.readResourceKey(TeaTypeManager.TEA_TYPE));
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, AddTeaEffectsAction action) {
-            ResourceLocation id = TeaTypeManager.getId(action.type);
-            buf.writeResourceLocation(id);
+            buf.writeResourceKey(action.type);
         }
     }
 

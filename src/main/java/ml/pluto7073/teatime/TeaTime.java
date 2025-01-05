@@ -11,8 +11,8 @@ import ml.pluto7073.teatime.event.ModEvents;
 import ml.pluto7073.teatime.gui.handlers.TTMenuTypes;
 import ml.pluto7073.teatime.item.ModItems;
 import ml.pluto7073.teatime.recipe.ModRecipes;
-import ml.pluto7073.teatime.recipe.TeaBaseSpecialtyDrink;
 import ml.pluto7073.teatime.stats.TTStats;
+import ml.pluto7073.teatime.teatypes.TeaSpecialtyBase;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.fabricmc.api.ModInitializer;
@@ -37,12 +37,9 @@ public class TeaTime implements ModInitializer {
     public static final Logger logger = LogManager.getLogger("TeaTime");
     public static ResourceKey<CreativeModeTab> TT_GROUP;
 
-    private static TeaTime INSTANCE;
-
     @Override
     public void onInitialize() {
-        INSTANCE = this;
-        initPDAPI();
+        TeaSpecialtyBase.init();
         ModBlocks.init();
         ModBlockEntityTypes.init();
         ModRecipes.init();
@@ -55,20 +52,6 @@ public class TeaTime implements ModInitializer {
         registerResourceReloadListener();
         ModEvents.init();
         TTMenuTypes.init();
-    }
-
-    private static void initPDAPI() {
-        SpecialtyDrinkManager.JSON_READERS
-                .put(asId("tea_base_specialty_drink"), TeaBaseSpecialtyDrink::fromJson);
-        SpecialtyDrinkManager.PACKET_READERS
-                .put(asId("tea_base_specialty_drink"), TeaBaseSpecialtyDrink::fromNetwork);
-        SpecialtyDrinkManager.PACKET_WRITERS
-                .put(asId("tea_base_specialty_drink"), (drink, buf) -> {
-                    if (!(drink instanceof TeaBaseSpecialtyDrink tea)) throw new IllegalStateException();
-                    tea.toNetwork(buf);
-                });
-        DrinkAdditionManager.DEPENDENCIES.add(asId("custom_tea_types_registerer"));
-        SpecialtyDrinkManager.DEPENDENCIES.add(asId("custom_tea_types_registerer"));
     }
 
     public static void createItemGroup() {
@@ -90,10 +73,6 @@ public class TeaTime implements ModInitializer {
                     stacks.acceptAll(TeaTimeUtils.getTea());
                     stacks.accept(PDItems.MILK_BOTTLE);
                 });
-    }
-
-    public static TeaTime getInstance() {
-        return INSTANCE;
     }
 
     public static void registerResourceReloadListener() {

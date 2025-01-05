@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6.+'
 	id 'maven-publish'
 }
 
@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = project.minecraft_version + "+" + project.mod_version
 group = project.maven_group
 
 repositories {
@@ -22,7 +22,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings(loom.layered {
 		it.mappings "org.quiltmc:quilt-mappings:${minecraft_version}+build.${quilt_mappings}:intermediary-v2"
-		it.parchment "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip"
+		//it.parchment "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip"
 		it.officialMojangMappings { nameSyntheticMembers = false }
 	})
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -34,14 +34,14 @@ dependencies {
 	modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
 
-	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property "version", mod_version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": mod_version
 	}
 }
 

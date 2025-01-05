@@ -1,6 +1,7 @@
 package ml.pluto7073.teatime.recipe.special;
 
 import ml.pluto7073.pdapi.recipes.DrinkWorkstationRecipe;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -9,6 +10,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
+@MethodsReturnNonnullByDefault
 public abstract class SpecialAdditionRecipe extends DrinkWorkstationRecipe {
 
     public SpecialAdditionRecipe(ResourceLocation id, Ingredient base, Ingredient add, String addin) {

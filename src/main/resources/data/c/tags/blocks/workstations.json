@@ -5,6 +5,6 @@
     "minecraft:smithing_table",
     "minecraft:fletching_table",
     "minecraft:cartography_table",
-    "plutoscoffee:coffee_workstation"
+    "pdapi:drink_workstation"
   ]
 }

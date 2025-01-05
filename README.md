@@ -16,11 +16,11 @@ Check out the entire Pluto's Drinks collection [here](https://modrinth.com/colle
 - Process the tea leaves with a combination of withering, steaming, rolling, and drying the leaves
 - Craft a tea bag using String, Paper, Processed tea leaves, and an addition of your choice
 - Place the tea bag in a bottle of water in order to brew your tea
-- Use the DrinkAdditions system ported from Pluto's Coffee Mod to add custom ingredients to your tea
+- Add custom ingredients to your tea using Drink Additions
 - Using datapacks, add custom tea types that can have different potion effects
+- Use tea bags as Drink Additions to create Tea Lattes or add tea to other drinks
 
 ## Cross Mod Features
-- If Pluto's Coffee Mod is also installed, Tea can be used in lattes to create a Tea Latte
 - Tea will offer a little hydration in the [Dehydration](https://www.curseforge.com/minecraft/mc-mods/dehydration) mod
 
 ### The Tea Making process will be added to the Pluto's Drinks wiki soon

@@ -1,6 +1,8 @@
 {
-  "type": "teatime:tea_base_specialty_drink",
-  "tea": "teatime:concealing_tea",
+  "base": {
+    "type": "teatime:tea",
+    "tea": "teatime:concealing_tea"
+  },
   "additions": [
     "pdapi:ice",
     "pdapi:milk",
@@ -40,5 +42,8 @@
       "duration": 200,
       "amplifier": 1
     }
-  ]
+  ],
+  "caffeine": {
+    "pdapi:caffeine": 50
+  }
 }

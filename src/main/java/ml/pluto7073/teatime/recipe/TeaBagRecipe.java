@@ -33,7 +33,7 @@ public class TeaBagRecipe extends CustomRecipe {
         if (!items.contains(Items.STRING) || !items.contains(Items.PAPER)) return false;
         items.remove(Items.PAPER);
         items.remove(Items.STRING);
-        return TeaTypeManager.getFromIngredients(items) != TeaTypeManager.EMPTY;
+        return TeaTypeManager.getFromIngredients(items) != TeaTypeManager.EMPTY_TYPE;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TeaBagRecipe extends CustomRecipe {
         ingredients.remove(Items.STRING);
         ItemStack teaBag = new ItemStack(ModItems.TEA_BAG, 1);
         TeaType teaType = TeaTypeManager.getFromIngredients(ingredients);
-        if (teaType == TeaTypeManager.EMPTY) {
+        if (teaType == TeaTypeManager.EMPTY_TYPE) {
             throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(BuiltInRegistries.ITEM::getId).toList());
         }
         return TeaTimeUtils.setTeaType(teaBag, teaType);
