@@ -1,0 +1,10 @@
+{
+  "changesColor": true,
+  "color": 12877105,
+  "onDrinkActions": [
+    {
+      "type": "teatime:add_tea_effects",
+      "tea": "teatime:earl_gray"
+    }
+  ]
+}
