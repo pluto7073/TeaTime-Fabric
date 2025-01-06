@@ -72,19 +72,27 @@ jar {
 	}
 }
 
-// configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
+	repositories {
+		maven {
+			url = System.getenv("PUBLISH_LOCATION")
 		}
 	}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+	publications {
+
+		mavenJava(MavenPublication) {
+			artifactId = 'teatime'
+
+			from(components.java)
+			pom.withXml {
+				Node pom = asNode()
+				pom.dependencies.'*'.findAll() {
+					it.artifactId.text() != 'pdapi' && it.artifactId.text() != 'fabric-api'
+				}.each() {
+					it.parent().remove(it)
+				}
+			}
+		}
 	}
 }
