@@ -28,10 +28,8 @@ public class TeaInLatteAdditionRecipe extends SpecialAdditionRecipe {
 
     @Override
     public boolean matches(Container container, Level level) {
-        Item latteItem = BuiltInRegistries.ITEM.get(new ResourceLocation("plutoscoffee:latte"));
-        if (!FabricLoader.getInstance().isModLoaded("plutoscoffee")) return false;
         ItemStack input = container.getItem(0), addition = container.getItem(1);
-        if (!input.is(latteItem)) return false;
+        if (!input.is(PDTags.WORKSTATION_DRINKS)) return false;
         if (!addition.is(ModItems.TEA_BAG)) return false;
         return TeaTimeUtils.getTeaTypeId(addition).equals(getResultId());
     }
