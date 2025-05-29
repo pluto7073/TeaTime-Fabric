@@ -10,5 +10,6 @@
       "radius": 5,
       "includeDrinker": false
     }
-  ]
+  ],
+  "volume": 0.25
 }

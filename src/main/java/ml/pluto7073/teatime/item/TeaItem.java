@@ -24,7 +24,7 @@ import java.util.List;
 public class TeaItem extends AbstractCustomizableDrinkItem {
 
     public TeaItem(Properties settings) {
-        super(Items.GLASS_BOTTLE, Temperature.HOT, settings);
+        super(Items.GLASS_BOTTLE, 12, settings);
     }
 
     @Override

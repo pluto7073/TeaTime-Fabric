@@ -6,5 +6,6 @@
       "type": "teatime:add_tea_effects",
       "tea": "teatime:withered_tea"
     }
-  ]
+  ],
+  "volume": 1
 }

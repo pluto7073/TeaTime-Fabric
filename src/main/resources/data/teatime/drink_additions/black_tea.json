@@ -6,5 +6,6 @@
       "type": "teatime:add_tea_effects",
       "tea": "teatime:black_tea"
     }
-  ]
+  ],
+  "volume": 1
 }
