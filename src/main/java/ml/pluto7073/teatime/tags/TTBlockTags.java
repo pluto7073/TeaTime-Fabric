@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
-public class ModBlockTags {
+public class TTBlockTags {
 
     public static final TagKey<Block> WORKSTATIONS = TagKey.create(Registries.BLOCK, new ResourceLocation("c:workstations"));
 

@@ -5,7 +5,7 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapelessDisplay;
 import ml.pluto7073.pdapi.PDAPI;
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.ItemLike;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class TeaREI implements REIClientPlugin {
             List<Item> ingredients = Lists.newArrayList(tea.getIngredients().iterator());
             ingredients.add(0, Items.STRING);
             ingredients.add(0, Items.PAPER);
-            ItemStack teaBag = TeaTimeUtils.setTeaType(new ItemStack(ModItems.TEA_BAG), tea);
+            ItemStack teaBag = TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA_BAG), tea);
             bags.add(teaBag);
             DefaultCustomShapelessDisplay display = DefaultCustomShapelessDisplay.simple(
                     ingredients.stream().map(EntryIngredients::of).toList(),
@@ -49,7 +48,7 @@ public class TeaREI implements REIClientPlugin {
                         EntryIngredients.of(water),
                         EntryIngredients.ofItemStacks(bags)
                 ),
-                List.of(EntryIngredients.of(ModItems.TEA)),
+                List.of(EntryIngredients.of(TTItems.TEA)),
                 Optional.empty()
         ));
     }

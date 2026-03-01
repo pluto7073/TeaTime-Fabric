@@ -73,12 +73,12 @@ public class RollingRecipe implements Recipe<Container> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ROLLING_SERIALIZER;
+        return TTRecipes.ROLLING_SERIALIZER;
     }
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipes.ROLLING;
+        return TTRecipes.ROLLING;
     }
 
     public static class Serializer implements RecipeSerializer<RollingRecipe> {

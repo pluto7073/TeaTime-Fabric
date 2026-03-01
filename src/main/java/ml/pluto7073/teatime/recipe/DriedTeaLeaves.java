@@ -26,7 +26,7 @@ public class DriedTeaLeaves extends SpecialSmeltingRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.DRIED_TEA_LEAVES;
+        return TTRecipes.DRIED_TEA_LEAVES;
     }
 
     @Override

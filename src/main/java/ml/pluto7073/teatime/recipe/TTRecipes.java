@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 
-public class ModRecipes {
+public class TTRecipes {
 
     //Recipe Types
     public static final RecipeType<SteamerRecipe> STEAMING;

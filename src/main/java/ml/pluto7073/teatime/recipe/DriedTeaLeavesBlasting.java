@@ -26,7 +26,7 @@ public class DriedTeaLeavesBlasting extends SpecialBlastingRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.DRIED_TEA_LEAVES_BLASTING;
+        return TTRecipes.DRIED_TEA_LEAVES_BLASTING;
     }
 
     @Override

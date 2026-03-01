@@ -1,7 +1,7 @@
 package ml.pluto7073.teatime.item;
 
 import ml.pluto7073.teatime.TeaTime;
-import ml.pluto7073.teatime.block.ModBlocks;
+import ml.pluto7073.teatime.block.TTBlocks;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +9,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemNameBlockItem;
 
-public class ModItems {
+public class TTItems {
 
     public static final Item TEA_LEAVES = new Item(new Item.Properties());
     public static final Item WITHERED_TEA_LEAVES = new Item(new Item.Properties());
@@ -20,8 +20,8 @@ public class ModItems {
     public static final Item DRIED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item TEA_BAG = new TeaBagItem(new Item.Properties());
     public static final Item TEA = new TeaItem(new Item.Properties().stacksTo(1));
-    public static final Item TEA_SEEDS = new ItemNameBlockItem(ModBlocks.TEA_SHRUB, new Item.Properties());
-    public static final Item STEAMER = new BlockItem(ModBlocks.STEAMER, new Item.Properties());
+    public static final Item TEA_SEEDS = new ItemNameBlockItem(TTBlocks.TEA_SHRUB, new Item.Properties());
+    public static final Item STEAMER = new BlockItem(TTBlocks.STEAMER, new Item.Properties());
 
     private static void register(String id, Item item) {
         Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(TeaTime.MOD_ID, id), item);

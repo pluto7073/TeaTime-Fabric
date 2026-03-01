@@ -3,7 +3,7 @@ package ml.pluto7073.teatime.block.entity;
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import ml.pluto7073.teatime.gui.handlers.SteamerMenu;
-import ml.pluto7073.teatime.recipe.ModRecipes;
+import ml.pluto7073.teatime.recipe.TTRecipes;
 import ml.pluto7073.teatime.recipe.SteamerRecipe;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -64,7 +64,7 @@ public class SteamerBlockEntity extends BaseContainerBlockEntity implements Worl
     private final RecipeManager.CachedCheck<Container, ? extends SteamerRecipe> matchGetter;
 
     public SteamerBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(ModBlockEntityTypes.STEAMER_TYPE, blockPos, blockState);
+        super(ModBlockEntityTypes.STEAMER, blockPos, blockState);
         this.inventory = NonNullList.withSize(3, ItemStack.EMPTY);
         this.propertyDelegate = new ContainerData() {
             @Override
@@ -117,7 +117,7 @@ public class SteamerBlockEntity extends BaseContainerBlockEntity implements Worl
             }
         };
         this.recipesUsed = new Object2IntOpenHashMap<>();
-        this.matchGetter = RecipeManager.createCheck(ModRecipes.STEAMING);
+        this.matchGetter = RecipeManager.createCheck(TTRecipes.STEAMING);
     }
 
     public static Map<Item, Integer> createWaterTimeMap() {

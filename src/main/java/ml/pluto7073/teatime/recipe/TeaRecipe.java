@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.recipe;
 
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -38,7 +38,7 @@ public class TeaRecipe extends CustomRecipe {
                     return false;
                 }
             } else {
-                if (!stack.is(ModItems.TEA_BAG) || hasTeaBag) {
+                if (!stack.is(TTItems.TEA_BAG) || hasTeaBag) {
                     return false;
                 }
                 hasTeaBag = true;
@@ -52,13 +52,13 @@ public class TeaRecipe extends CustomRecipe {
         ItemStack teaBag = ItemStack.EMPTY;
         for (int i = 0; i < container.getContainerSize(); ++i) {
             ItemStack stack = container.getItem(i);
-            if (stack.is(ModItems.TEA_BAG)) {
+            if (stack.is(TTItems.TEA_BAG)) {
                 teaBag = stack;
                 break;
             }
         }
         TeaType type = TeaTimeUtils.getTeaType(teaBag);
-        return TeaTimeUtils.setTeaType(new ItemStack(ModItems.TEA, 1), type);
+        return TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA, 1), type);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class TeaRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.TEA_BREWING;
+        return TTRecipes.TEA_BREWING;
     }
 
 }

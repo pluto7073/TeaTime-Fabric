@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.mixin;
 
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.ComposterBlock;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +18,8 @@ public class ComposterBlockMixin {
 
     @Inject(at = @At("TAIL"), method = "bootStrap")
     private static void teatime_registerModCompostItems(CallbackInfo ci) {
-        add(0.3F, ModItems.TEA_SEEDS);
-        add(0.3F, ModItems.TEA_LEAVES);
+        add(0.3F, TTItems.TEA_SEEDS);
+        add(0.3F, TTItems.TEA_LEAVES);
     }
 
 }

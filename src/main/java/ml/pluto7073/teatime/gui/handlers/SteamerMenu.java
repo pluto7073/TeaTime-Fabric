@@ -1,7 +1,7 @@
 package ml.pluto7073.teatime.gui.handlers;
 
 import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
-import ml.pluto7073.teatime.recipe.ModRecipes;
+import ml.pluto7073.teatime.recipe.TTRecipes;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -145,7 +145,7 @@ public class SteamerMenu extends RecipeBookMenu<Container> {
     }
 
     protected boolean isSteamable(ItemStack stack) {
-        return this.world.getRecipeManager().getRecipeFor(ModRecipes.STEAMING, new SimpleContainer(stack), this.world).isPresent();
+        return this.world.getRecipeManager().getRecipeFor(TTRecipes.STEAMING, new SimpleContainer(stack), this.world).isPresent();
     }
 
     protected boolean isWater(ItemStack stack) {

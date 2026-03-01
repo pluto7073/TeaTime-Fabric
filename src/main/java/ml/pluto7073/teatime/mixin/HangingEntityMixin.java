@@ -1,7 +1,7 @@
 package ml.pluto7073.teatime.mixin;
 
 import ml.pluto7073.teatime.entity.TTTrackedData;
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
@@ -18,7 +18,7 @@ public abstract class HangingEntityMixin extends EntityMixin {
     public void teatime$updateWitheringTea(CallbackInfo ci) {
         if (!(((HangingEntity) (Object) this) instanceof ItemFrame thisFrame)) return;
         ItemStack witheringItem = thisFrame.getEntityData().get(ItemFrameEntityAccessor.getItemStack());
-        if (!witheringItem.is(ModItems.TEA_LEAVES)) {
+        if (!witheringItem.is(TTItems.TEA_LEAVES)) {
             this.entityData.set(TTTrackedData.WITHERING_AGE, 0);
             this.entityData.set(TTTrackedData.WITHERING, false);
             return;
@@ -30,7 +30,7 @@ public abstract class HangingEntityMixin extends EntityMixin {
             age = 0;
         }
         if (age >= 6000) {
-            this.entityData.set(ItemFrameEntityAccessor.getItemStack(), new ItemStack(ModItems.WITHERED_TEA_LEAVES));
+            this.entityData.set(ItemFrameEntityAccessor.getItemStack(), new ItemStack(TTItems.WITHERED_TEA_LEAVES));
         }
         this.entityData.set(TTTrackedData.WITHERING_AGE, age);
     }

@@ -6,7 +6,7 @@ import ml.pluto7073.pdapi.PDRegistries;
 import ml.pluto7073.pdapi.specialty.SpecialtyDrinkBase;
 import ml.pluto7073.pdapi.specialty.SpecialtyDrinkBaseSerializer;
 import ml.pluto7073.teatime.TeaTime;
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -25,7 +25,7 @@ public class TeaSpecialtyBase implements SpecialtyDrinkBase {
 
     @Override
     public ItemStack buildItemStack() {
-        return TeaTimeUtils.setTeaType(new ItemStack(ModItems.TEA), teaType);
+        return TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA), teaType);
     }
 
     @Override

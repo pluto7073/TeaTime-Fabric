@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.recipe;
 
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
@@ -41,7 +41,7 @@ public class TeaBagRecipe extends CustomRecipe {
         List<Item> ingredients = getItems(container);
         ingredients.remove(Items.PAPER);
         ingredients.remove(Items.STRING);
-        ItemStack teaBag = new ItemStack(ModItems.TEA_BAG, 1);
+        ItemStack teaBag = new ItemStack(TTItems.TEA_BAG, 1);
         TeaType teaType = TeaTypeManager.getFromIngredients(ingredients);
         if (teaType == TeaTypeManager.EMPTY_TYPE) {
             throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(BuiltInRegistries.ITEM::getId).toList());
@@ -56,7 +56,7 @@ public class TeaBagRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.TEA_BAG_MAKING;
+        return TTRecipes.TEA_BAG_MAKING;
     }
 
     public static List<Item> getItems(CraftingContainer container) {

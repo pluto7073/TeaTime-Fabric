@@ -1,8 +1,8 @@
 package ml.pluto7073.teatime.event;
 
-import ml.pluto7073.teatime.recipe.ModRecipes;
+import ml.pluto7073.teatime.recipe.TTRecipes;
 import ml.pluto7073.teatime.recipe.RollingRecipe;
-import ml.pluto7073.teatime.tags.ModBlockTags;
+import ml.pluto7073.teatime.tags.TTBlockTags;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
@@ -22,7 +22,7 @@ public class RollTeaLeaves {
     public static final Random RANDOM = new Random();
 
     public static void rollLeavesEvent() {
-        RecipeManager.CachedCheck<Container, ? extends RollingRecipe> matchGetter = RecipeManager.createCheck(ModRecipes.ROLLING);
+        RecipeManager.CachedCheck<Container, ? extends RollingRecipe> matchGetter = RecipeManager.createCheck(TTRecipes.ROLLING);
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
             if (player == null ) {
                 return InteractionResult.PASS;
@@ -35,7 +35,7 @@ public class RollTeaLeaves {
                 return InteractionResult.PASS;
             }
 
-            if (!state.is(ModBlockTags.WORKSTATIONS)) {
+            if (!state.is(TTBlockTags.WORKSTATIONS)) {
                 return InteractionResult.PASS;
             }
 

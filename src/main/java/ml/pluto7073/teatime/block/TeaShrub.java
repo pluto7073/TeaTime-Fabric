@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.block;
 
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
@@ -10,8 +10,6 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import javax.swing.text.html.BlockView;
 
 @MethodsReturnNonnullByDefault
 public class TeaShrub extends CropBlock {
@@ -33,7 +31,7 @@ public class TeaShrub extends CropBlock {
 
     @Override
     protected ItemLike getBaseSeedId() {
-        return ModItems.TEA_SEEDS;
+        return TTItems.TEA_SEEDS;
     }
 
     @Override

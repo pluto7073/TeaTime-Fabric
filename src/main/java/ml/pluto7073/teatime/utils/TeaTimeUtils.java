@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.pdapi.addition.DrinkAddition;
-import ml.pluto7073.teatime.item.ModItems;
+import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -36,7 +36,7 @@ public final class TeaTimeUtils {
     public static List<ItemStack> getRolledLeaves() {
         List<ItemStack> stacks = new ArrayList<>();
         for (String s : DRYING_RESULTS.keySet()) {
-            ItemStack stack = new ItemStack(ModItems.ROLLED_TEA_LEAVES);
+            ItemStack stack = new ItemStack(TTItems.ROLLED_TEA_LEAVES);
             stack.getOrCreateTagElement("TeaData").putString("mod", s);
             stacks.add(stack);
         }
@@ -45,7 +45,7 @@ public final class TeaTimeUtils {
 
     public static List<ItemStack> getTeaBags() {
         List<ItemStack> stacks = new ArrayList<>();
-        ItemStack stack = new ItemStack(ModItems.TEA_BAG);
+        ItemStack stack = new ItemStack(TTItems.TEA_BAG);
         for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
             stacks.add(setTeaType(stack.copy(), TeaTypeManager.get(i)));
@@ -55,7 +55,7 @@ public final class TeaTimeUtils {
 
     public static List<ItemStack> getTea() {
         List<ItemStack> stacks = new ArrayList<>();
-        ItemStack tea = new ItemStack(ModItems.TEA, 1);
+        ItemStack tea = new ItemStack(TTItems.TEA, 1);
         for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
             stacks.add(setTeaType(tea.copy(), TeaTypeManager.get(i)));
@@ -66,7 +66,7 @@ public final class TeaTimeUtils {
     public static Item getDryingResult(ItemStack stack) {
         String mod = stack.getOrCreateTagElement("TeaData").contains("mod") ?
                 stack.getOrCreateTagElement("TeaData").getString("mod") : "teatime:null";
-        return DRYING_RESULTS.getOrDefault(mod, ModItems.ROLLED_TEA_LEAVES);
+        return DRYING_RESULTS.getOrDefault(mod, TTItems.ROLLED_TEA_LEAVES);
     }
 
     public static boolean hasDryingResult(ItemStack stack) {
@@ -140,8 +140,8 @@ public final class TeaTimeUtils {
     }
 
     static {
-        DRYING_RESULTS.put("teatime:steamed", ModItems.FERMENTED_TEA_LEAVES);
-        DRYING_RESULTS.put("teatime:withered", ModItems.DRIED_TEA_LEAVES);
+        DRYING_RESULTS.put("teatime:steamed", TTItems.FERMENTED_TEA_LEAVES);
+        DRYING_RESULTS.put("teatime:withered", TTItems.DRIED_TEA_LEAVES);
     }
 
 }

@@ -2,7 +2,7 @@ package ml.pluto7073.teatime.recipe;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import ml.pluto7073.teatime.block.ModBlocks;
+import ml.pluto7073.teatime.block.TTBlocks;
 import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
@@ -70,12 +70,12 @@ public class SteamerRecipe implements Recipe<Container> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.STEAMING_SERIALIZER;
+        return TTRecipes.STEAMING_SERIALIZER;
     }
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipes.STEAMING;
+        return TTRecipes.STEAMING;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class SteamerRecipe implements Recipe<Container> {
 
     @Override
     public ItemStack getToastSymbol() {
-        return new ItemStack(ModBlocks.STEAMER);
+        return new ItemStack(TTBlocks.STEAMER);
     }
 
     public static class Serializer implements RecipeSerializer<SteamerRecipe> {

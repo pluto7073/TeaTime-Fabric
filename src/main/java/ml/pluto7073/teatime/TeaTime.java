@@ -1,16 +1,14 @@
 package ml.pluto7073.teatime;
 
-import ml.pluto7073.pdapi.addition.DrinkAdditionManager;
 import ml.pluto7073.pdapi.item.PDItems;
-import ml.pluto7073.pdapi.specialty.SpecialtyDrinkManager;
 import ml.pluto7073.teatime.action.TeaTimeActions;
-import ml.pluto7073.teatime.block.ModBlocks;
+import ml.pluto7073.teatime.block.TTBlocks;
 import ml.pluto7073.teatime.block.entity.ModBlockEntityTypes;
 import ml.pluto7073.teatime.entity.TTTrackedData;
-import ml.pluto7073.teatime.event.ModEvents;
+import ml.pluto7073.teatime.event.TTEvents;
 import ml.pluto7073.teatime.gui.handlers.TTMenuTypes;
-import ml.pluto7073.teatime.item.ModItems;
-import ml.pluto7073.teatime.recipe.ModRecipes;
+import ml.pluto7073.teatime.item.TTItems;
+import ml.pluto7073.teatime.recipe.TTRecipes;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaSpecialtyBase;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
@@ -40,35 +38,35 @@ public class TeaTime implements ModInitializer {
     @Override
     public void onInitialize() {
         TeaSpecialtyBase.init();
-        ModBlocks.init();
+        TTBlocks.init();
         ModBlockEntityTypes.init();
-        ModRecipes.init();
-        ModItems.init();
+        TTRecipes.init();
+        TTItems.init();
         TeaTypeManager.init();
         TTStats.init();
         TTTrackedData.init();
         TeaTimeActions.init();
         createItemGroup();
         registerResourceReloadListener();
-        ModEvents.init();
+        TTEvents.init();
         TTMenuTypes.init();
     }
 
     public static void createItemGroup() {
         TT_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, asId("tt_group"));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TT_GROUP, FabricItemGroup.builder()
-                .icon(() -> new ItemStack(ModItems.TEA_LEAVES)).title(Component.translatable("itemGroup.teatime.tt_group")).build());
+                .icon(() -> new ItemStack(TTItems.TEA_LEAVES)).title(Component.translatable("itemGroup.teatime.tt_group")).build());
         ItemGroupEvents.modifyEntriesEvent(TT_GROUP).register(stacks -> {
-                    stacks.accept(new ItemStack(ModItems.STEAMER));
+                    stacks.accept(new ItemStack(TTItems.STEAMER));
                     stacks.accept(PDItems.DRINK_WORKSTATION);
-                    stacks.accept(new ItemStack(ModItems.TEA_SEEDS));
-                    stacks.accept(new ItemStack(ModItems.TEA_LEAVES));
-                    stacks.accept(new ItemStack(ModItems.WITHERED_TEA_LEAVES));
-                    stacks.accept(new ItemStack(ModItems.WHITE_TEA_LEAVES));
-                    stacks.accept(new ItemStack(ModItems.STEAMED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.TEA_SEEDS));
+                    stacks.accept(new ItemStack(TTItems.TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.WITHERED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.WHITE_TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.STEAMED_TEA_LEAVES));
                     stacks.acceptAll(TeaTimeUtils.getRolledLeaves());
-                    stacks.accept(new ItemStack(ModItems.DRIED_TEA_LEAVES));
-                    stacks.accept(new ItemStack(ModItems.FERMENTED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.DRIED_TEA_LEAVES));
+                    stacks.accept(new ItemStack(TTItems.FERMENTED_TEA_LEAVES));
                     stacks.acceptAll(TeaTimeUtils.getTeaBags());
                     stacks.acceptAll(TeaTimeUtils.getTea());
                     stacks.accept(PDItems.MILK_BOTTLE);

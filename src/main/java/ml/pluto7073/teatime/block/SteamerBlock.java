@@ -117,7 +117,7 @@ public class SteamerBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntityTypes.STEAMER_TYPE, SteamerBlockEntity::tick);
+        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntityTypes.STEAMER, SteamerBlockEntity::tick);
     }
 
     protected void openScreen(Level level, BlockPos pos, Player player) {
