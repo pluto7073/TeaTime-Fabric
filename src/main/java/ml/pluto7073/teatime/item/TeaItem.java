@@ -58,10 +58,10 @@ public class TeaItem extends AbstractCustomizableDrinkItem {
     }
 
     @Override
-    public float getChemicalContent(ResourceLocation name, ItemStack stack) {
+    public float getChemicalContent(ResourceLocation name, ItemStack stack, Level level) {
         if (!"pdapi:caffeine".equals(name.toString()))
-            return super.getChemicalContent(name, stack);
-        float fromAdditions = super.getChemicalContent(name, stack);
+            return super.getChemicalContent(name, stack, level);
+        float fromAdditions = super.getChemicalContent(name, stack, level);
         fromAdditions += TeaTimeUtils.getTeaType(stack).getCaffeine();
         return fromAdditions;
     }

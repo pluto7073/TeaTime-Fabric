@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6.+'
+	id 'fabric-loom' version '1.10.+'
 	id 'maven-publish'
 }
 
@@ -13,7 +13,7 @@ group = project.maven_group
 repositories {
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
-	maven { url "https://pluto-mod-maven.web.app/maven" }
+	maven { url "https://maven.plutonia.xyz/maven" }
 	maven { url = "https://maven.parchmentmc.org" }
 	maven { url = "https://maven.quiltmc.org/repository/release" }
 }
@@ -22,14 +22,14 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings(loom.layered {
 		it.mappings "org.quiltmc:quilt-mappings:${minecraft_version}+build.${quilt_mappings}:intermediary-v2"
-		//it.parchment "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip"
 		it.officialMojangMappings { nameSyntheticMembers = false }
+		it.parchment "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip"
 	})
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modApi "ml.pluto7073:pdapi:${minecraft_version}+${pdapi_version}"
+	modImplementation "ml.pluto7073:pdapi:${minecraft_version}+${pdapi_version}"
 
 	modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
@@ -88,7 +88,7 @@ publishing {
 			pom.withXml {
 				Node pom = asNode()
 				pom.dependencies.'*'.findAll() {
-					it.artifactId.text() != 'pdapi' && it.artifactId.text() != 'fabric-api'
+					it.artifactId.text() != 'pdapi'
 				}.each() {
 					it.parent().remove(it)
 				}

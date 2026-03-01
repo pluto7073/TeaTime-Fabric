@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,7 +117,7 @@ public final class TeaTimeUtils {
         return supplier.get();
     }
 
-    public static int getTeaColor(ItemStack stack) {
+    public static int getTeaColor(ItemStack stack, Level level) {
         int colour = 0;
         if (getTeaType(stack) != null) colour = getTeaType(stack).getColour();
         float r = (colour >> 16 & 255) / 255.0F;
@@ -124,7 +125,7 @@ public final class TeaTimeUtils {
         float b = (colour & 255) / 255.0F;
         int colourCount = 1;
 
-        for (DrinkAddition addition : DrinkUtil.getAdditionsFromStack(stack)) {
+        for (DrinkAddition addition : DrinkUtil.getAdditionsFromStack(stack, level)) {
             if (!addition.changesColor()) continue;
             int additionColour = addition.getColor();
             r += (additionColour >> 16 & 255) / 255.0F;

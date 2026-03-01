@@ -49,6 +49,6 @@
     "fabric-api": "*",
     "minecraft": "~1.20.1",
     "java": ">=17",
-    "pdapi": "0.3.x"
+    "pdapi": "0.4.x"
   }
 }

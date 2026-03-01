@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 
@@ -20,7 +21,7 @@ public class TeaTimeClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientboundTTPackets.register();
-        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> tintIndex > 0 ? -1 : TeaTimeUtils.getTeaColor(stack), ModItems.TEA);
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> tintIndex > 0 ? -1 : TeaTimeUtils.getTeaColor(stack, Minecraft.getInstance().level), ModItems.TEA);
         MenuScreens.register(TTMenuTypes.STEAMER_MENU_TYPE, SteamerScreen::new);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TEA_SHRUB, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.STEAMER, RenderType.cutout());
