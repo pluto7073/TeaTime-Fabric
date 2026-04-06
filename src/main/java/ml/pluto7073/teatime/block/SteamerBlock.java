@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.block;
 
-import ml.pluto7073.teatime.block.entity.ModBlockEntityTypes;
+import ml.pluto7073.teatime.block.entity.TTBlockEntityTypes;
 import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -117,7 +117,7 @@ public class SteamerBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntityTypes.STEAMER, SteamerBlockEntity::tick);
+        return level.isClientSide ? null : createTickerHelper(type, TTBlockEntityTypes.STEAMER, SteamerBlockEntity::tick);
     }
 
     protected void openScreen(Level level, BlockPos pos, Player player) {

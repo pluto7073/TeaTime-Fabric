@@ -64,7 +64,7 @@ public class SteamerBlockEntity extends BaseContainerBlockEntity implements Worl
     private final RecipeManager.CachedCheck<Container, ? extends SteamerRecipe> matchGetter;
 
     public SteamerBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(ModBlockEntityTypes.STEAMER, blockPos, blockState);
+        super(TTBlockEntityTypes.STEAMER, blockPos, blockState);
         this.inventory = NonNullList.withSize(3, ItemStack.EMPTY);
         this.propertyDelegate = new ContainerData() {
             @Override

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "teatime:tea"
+    "teatime:tea",
+    "teatime:tea_mug"
   ]
 }

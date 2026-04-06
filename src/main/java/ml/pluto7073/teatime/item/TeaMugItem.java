@@ -1,6 +1,6 @@
 package ml.pluto7073.teatime.item;
 
-import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
+import ml.pluto7073.pdapi.item.AbstractMugDrinkItem;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
@@ -12,19 +12,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
-public class TeaItem extends AbstractCustomizableDrinkItem {
+public class TeaMugItem extends AbstractMugDrinkItem {
 
-    public TeaItem(Properties settings) {
-        super(Items.GLASS_BOTTLE, 12, settings);
+    public TeaMugItem(Block mugBlock, Item baseItem, double baseVolume, Properties settings) {
+        super(mugBlock, baseItem, baseVolume, settings);
     }
 
     @Override
@@ -66,4 +67,5 @@ public class TeaItem extends AbstractCustomizableDrinkItem {
         fromAdditions += TeaTimeUtils.getTeaType(stack, level).getCaffeine(level);
         return fromAdditions;
     }
+
 }

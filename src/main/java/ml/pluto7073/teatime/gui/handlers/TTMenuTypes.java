@@ -10,16 +10,13 @@ import net.minecraft.world.inventory.MenuType;
 
 public class TTMenuTypes {
 
-    public static final MenuType<SteamerMenu> STEAMER_MENU_TYPE;
+    public static final MenuType<SteamerMenu> STEAMER = register("steamer", SteamerMenu::new);
+    public static final MenuType<TeaKettleMenu> TEA_KETTLE = register("tea_kettle", TeaKettleMenu::new);
 
     public static void init() {}
 
     private static <T extends AbstractContainerMenu> MenuType<T> register(String id, MenuType.MenuSupplier<T> factory) {
         return Registry.register(BuiltInRegistries.MENU, new ResourceLocation(TeaTime.MOD_ID, id), new MenuType<>(factory, FeatureFlags.VANILLA_SET));
-    }
-
-    static {
-        STEAMER_MENU_TYPE = register("steamer", SteamerMenu::new);
     }
 
 }

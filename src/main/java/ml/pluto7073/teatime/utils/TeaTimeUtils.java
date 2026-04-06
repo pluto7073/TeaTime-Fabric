@@ -2,6 +2,7 @@ package ml.pluto7073.teatime.utils;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
 import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.pdapi.addition.DrinkAddition;
 import ml.pluto7073.teatime.item.TTItems;
@@ -43,22 +44,32 @@ public final class TeaTimeUtils {
         return stacks;
     }
 
-    public static List<ItemStack> getTeaBags() {
+    public static List<ItemStack> getTeaBags(Level level) {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack stack = new ItemStack(TTItems.TEA_BAG);
-        for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
+        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(stack.copy(), TeaTypeManager.get(i)));
+            stacks.add(setTeaType(stack.copy(), level.getTeaTypeManager().get(i), level));
         }
         return stacks;
     }
 
-    public static List<ItemStack> getTea() {
+    public static List<ItemStack> getTea(Level level) {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack tea = new ItemStack(TTItems.TEA, 1);
-        for (ResourceLocation i : TeaTypeManager.getOrderedIdListDisplayed()) {
+        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
             if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(tea.copy(), TeaTypeManager.get(i)));
+            stacks.add(setTeaType(tea.copy(), level.getTeaTypeManager().get(i), level));
+        }
+        return stacks;
+    }
+
+    public static List<ItemStack> getTeaMugs(Level level) {
+        List<ItemStack> stacks = new ArrayList<>();
+        ItemStack tea = new ItemStack(TTItems.TEA_MUG, 1);
+        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
+            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
+            stacks.add(setTeaType(tea.copy(), level.getTeaTypeManager().get(i), level));
         }
         return stacks;
     }
@@ -86,22 +97,21 @@ public final class TeaTimeUtils {
         return stack.getOrCreateTagElement("TeaData").contains("type") ? stack.getOrCreateTagElement("TeaData").getString("type") : "teatime:empty";
     }
 
-    public static TeaType getTeaType(ItemStack stack) {
-        return getTeaType(stack.getOrCreateTagElement("TeaData"));
+    public static TeaType getTeaType(ItemStack stack, Level level) {
+        return getTeaType(stack.getOrCreateTagElement("TeaData"), level);
     }
 
-    public static TeaType getTeaType(CompoundTag teaData) {
+    public static TeaType getTeaType(CompoundTag teaData, Level level) {
         String type = teaData.contains("type") ? teaData.getString("type") : "teatime:empty";
-        return TeaTypeManager.containsId(new ResourceLocation(type)) ? TeaTypeManager.get(new ResourceLocation(type)) : TeaTypeManager.EMPTY_TYPE;
+        return level.getTeaTypeManager().containsId(new ResourceLocation(type)) ? level.getTeaTypeManager().get(new ResourceLocation(type)) : TeaTypeManager.EMPTY_TYPE;
     }
 
     public static ResourceLocation getTeaTypeId(ItemStack stack) {
-        TeaType type = getTeaType(stack);
-        return TeaTypeManager.getId(type);
+        return new ResourceLocation(stack.getOrCreateTagElement("TeaData").getString("type"));
     }
 
-    public static ItemStack setTeaType(ItemStack stack, TeaType type) {
-        return setTeaType(stack, TeaTypeManager.getId(type));
+    public static ItemStack setTeaType(ItemStack stack, TeaType type, Level level) {
+        return setTeaType(stack, level.getTeaTypeManager().getId(type));
     }
 
     public static ItemStack setTeaType(ItemStack stack, ResourceLocation teaId) {
@@ -118,14 +128,18 @@ public final class TeaTimeUtils {
     }
 
     public static int getTeaColor(ItemStack stack, Level level) {
+        return getTeaColor(stack.getOrCreateTag(), level);
+    }
+
+    public static int getTeaColor(CompoundTag nbt, Level level) {
         int colour = 0;
-        if (getTeaType(stack) != null) colour = getTeaType(stack).getColour();
+        if (getTeaType(nbt.getCompound("TeaData"), level) != null) colour = getTeaType(nbt.getCompound("TeaData"), level).getColour(level);
         float r = (colour >> 16 & 255) / 255.0F;
         float g = (colour >> 8 & 255) / 255.0F;
         float b = (colour & 255) / 255.0F;
         int colourCount = 1;
 
-        for (DrinkAddition addition : DrinkUtil.getAdditionsFromStack(stack, level)) {
+        for (DrinkAddition addition : DrinkUtil.getAdditionsFromTag(nbt.getCompound(AbstractCustomizableDrinkItem.DRINK_DATA_NBT_KEY), level)) {
             if (!addition.changesColor()) continue;
             int additionColour = addition.getColor();
             r += (additionColour >> 16 & 255) / 255.0F;

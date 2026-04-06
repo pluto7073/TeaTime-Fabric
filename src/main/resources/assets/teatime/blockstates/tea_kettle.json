@@ -1,0 +1,11 @@
+{
+  "multipart": [
+    {
+      "apply": { "model": "teatime:block/tea_kettle" }
+    },
+    {
+      "apply": { "model": "teatime:block/tea_kettle_campfire" },
+      "when": { "campfire": true }
+    }
+  ]
+}

@@ -28,7 +28,7 @@ public class SteamerMenu extends RecipeBookMenu<Container> {
     }
 
     public SteamerMenu(int syncId, Inventory inventory, Container container, ContainerData propertyDelegate) {
-        super(TTMenuTypes.STEAMER_MENU_TYPE, syncId);
+        super(TTMenuTypes.STEAMER, syncId);
         this.category = RecipeBookType.CRAFTING;
         checkContainerSize(container, 3);
         checkContainerDataCount(propertyDelegate, PROPERTY_COUNT);
@@ -55,7 +55,7 @@ public class SteamerMenu extends RecipeBookMenu<Container> {
     @Override
     public void fillCraftSlotsStackedContents(StackedContents itemHelper) {
         if (this.container instanceof StackedContentsCompatible) {
-            ((StackedContentsCompatible)((Object)this.container)).fillStackedContents(itemHelper);
+            ((StackedContentsCompatible) this.container).fillStackedContents(itemHelper);
         }
     }
 

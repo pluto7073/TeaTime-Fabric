@@ -49,6 +49,10 @@ public class TeaRecipe extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingContainer container, RegistryAccess manager) {
+        return new ItemStack(TTItems.TEA);
+    }
+
+    public ItemStack assemble(CraftingContainer container, Level level) {
         ItemStack teaBag = ItemStack.EMPTY;
         for (int i = 0; i < container.getContainerSize(); ++i) {
             ItemStack stack = container.getItem(i);
@@ -57,8 +61,8 @@ public class TeaRecipe extends CustomRecipe {
                 break;
             }
         }
-        TeaType type = TeaTimeUtils.getTeaType(teaBag);
-        return TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA, 1), type);
+        TeaType type = TeaTimeUtils.getTeaType(teaBag, level);
+        return TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA, 1), type, level);
     }
 
     @Override

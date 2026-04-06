@@ -20,8 +20,9 @@ public class TeaBagItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
-        TeaType teaType = TeaTimeUtils.getTeaType(stack);
-        tooltip.add(Component.translatable(teaType.getTranslationKey()).withStyle(ChatFormatting.GRAY));
+        if (world == null) return;
+        TeaType teaType = TeaTimeUtils.getTeaType(stack, world);
+        tooltip.add(Component.translatable(teaType.getTranslationKey(world)).withStyle(ChatFormatting.GRAY));
     }
 
 }

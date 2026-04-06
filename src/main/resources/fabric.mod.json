@@ -41,6 +41,9 @@
         "description": "Every mod in the Pluto's Drinks collection",
         "icon": "assets/pdapi/icon.png"
       }
+    },
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1937": [ "ml/pluto7073/teatime/internal/TeaTimeLevelExtensions" ]
     }
   },
 

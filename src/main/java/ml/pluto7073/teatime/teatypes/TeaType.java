@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.*;
@@ -20,7 +21,7 @@ public class TeaType {
     public static final Codec<TeaType> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(Codec.optionalField("parent", ResourceKey.codec(TeaTypeManager.TEA_TYPE))
                             .forGetter(type -> type.parent),
-                            Codec.INT.fieldOf("color").orElse(0).forGetter(TeaType::getColour),
+                            Codec.INT.fieldOf("color").orElse(0).forGetter(type -> type.colour),
                             Codec.list(BuiltInRegistries.ITEM.byNameCodec()).fieldOf("ingredients")
                                     .forGetter(type -> type.ingredients),
                             Codec.INT.fieldOf("caffeine").orElse(0)
@@ -61,32 +62,32 @@ public class TeaType {
         return internal;
     }
 
-    public List<Item> getIngredients() {
+    public List<Item> getIngredients(TeaTypeManager manager) {
         ArrayList<Item> list = Lists.newArrayList(this.ingredients.iterator());
         parent.ifPresent(type ->
-                list.addAll(TeaTypeManager.get(type).getIngredients()));
+                list.addAll(manager.get(type).getIngredients(manager)));
         return list;
     }
 
-    public int getColour() {
-        return parent.isPresent() && colour == 0 ? TeaTypeManager.get(parent.get()).colour : colour;
+    public int getColour(Level level) {
+        return parent.isPresent() && colour == 0 ? level.getTeaTypeManager().get(parent.get()).colour : colour;
     }
 
-    public String getTranslationKey() {
+    public String getTranslationKey(Level level) {
         if (name != null && !name.isEmpty()) return name;
-        ResourceLocation id = TeaTypeManager.getId(this);
+        ResourceLocation id = level.getTeaTypeManager().getId(this);
         return id.toLanguageKey("tea_type");
     }
 
-    public int getCaffeine() {
-        return parent.map(teaTypeResourceKey -> TeaTypeManager.get(teaTypeResourceKey).caffeine)
+    public int getCaffeine(Level level) {
+        return parent.map(teaTypeResourceKey -> level.getTeaTypeManager().get(teaTypeResourceKey).caffeine)
                 .orElse(caffeine);
     }
 
-    public List<MobEffectInstance> getEffects() {
+    public List<MobEffectInstance> getEffects(Level level) {
         ArrayList<MobEffectInstance> list = Lists.newArrayList(this.effects.iterator());
         parent.ifPresent(teaTypeResourceKey ->
-                list.addAll(TeaTypeManager.get(teaTypeResourceKey).getEffects()));
+                list.addAll(level.getTeaTypeManager().get(teaTypeResourceKey).getEffects(level)));
         return list;
     }
 

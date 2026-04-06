@@ -29,7 +29,7 @@ public class AddTeaEffectsAction implements OnDrinkAction {
 
     @Override
     public void onDrink(ItemStack stack, Level level, LivingEntity user) {
-        List<MobEffectInstance> list = TeaTypeManager.get(type).getEffects();
+        List<MobEffectInstance> list = level.getTeaTypeManager().get(type).getEffects(level);
         list.forEach(user::addEffect);
     }
 

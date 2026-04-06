@@ -23,9 +23,10 @@ public class ClientboundTTPackets {
 
     @Environment(EnvType.CLIENT)
     private static void receiveCustomTeaTypesList(ClientboundSyncCustomTeaTypesPacket packet, LocalPlayer player, PacketSender sender) {
-        TeaTypeManager.resetRegistry();
+        player.clientLevel.getTeaTypeManager().resetRegistry();
 
-        packet.teaTypes().forEach(TeaTypeManager::register);
+        packet.teaTypes().forEach(player.clientLevel.getTeaTypeManager()::register);
+        player.clientLevel.getTeaTypeManager().handleIngredientsFromPacket(packet.ingredients());
     }
 
 }

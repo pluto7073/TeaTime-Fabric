@@ -9,6 +9,7 @@ import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -26,12 +27,13 @@ public class TeaREI implements REIClientPlugin {
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         List<ItemStack> bags = new ArrayList<>();
-        for (TeaType tea : TeaTypeManager.values()) {
-            if (Objects.equals(TeaTypeManager.getId(tea), PDAPI.asId("herbal"))) continue;
-            List<Item> ingredients = Lists.newArrayList(tea.getIngredients().iterator());
+        if (Minecraft.getInstance().level == null) return;
+        for (TeaType tea : Minecraft.getInstance().level.getTeaTypeManager().values()) {
+            if (Objects.equals(Minecraft.getInstance().level.getTeaTypeManager().getId(tea), PDAPI.asId("herbal"))) continue;
+            List<Item> ingredients = Lists.newArrayList(tea.getIngredients(Minecraft.getInstance().level.getTeaTypeManager()).iterator());
             ingredients.add(0, Items.STRING);
             ingredients.add(0, Items.PAPER);
-            ItemStack teaBag = TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA_BAG), tea);
+            ItemStack teaBag = TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA_BAG), tea, Minecraft.getInstance().level);
             bags.add(teaBag);
             DefaultCustomShapelessDisplay display = DefaultCustomShapelessDisplay.simple(
                     ingredients.stream().map(EntryIngredients::of).toList(),

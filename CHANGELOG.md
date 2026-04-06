@@ -1,4 +1,8 @@
 
+## Additions
+- Added a Tea Kettle and Mugs (via PDAPI)
+- Heat a Tea Kettle over a campfire (or a stove with Farmer's Delight), add water, add tea ingredients, then pour into cups
+- Cups can receive additions via Drink Workstations *or* by right clicking the cup with the ingredient
 
 ## Changes
 - Updated version numbering to 2.x.x (because this technically already was version 2.0)

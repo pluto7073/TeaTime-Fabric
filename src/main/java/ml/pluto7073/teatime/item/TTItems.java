@@ -1,5 +1,6 @@
 package ml.pluto7073.teatime.item;
 
+import ml.pluto7073.pdapi.item.PDItems;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.block.TTBlocks;
 import net.minecraft.core.Registry;
@@ -22,6 +23,8 @@ public class TTItems {
     public static final Item TEA = new TeaItem(new Item.Properties().stacksTo(1));
     public static final Item TEA_SEEDS = new ItemNameBlockItem(TTBlocks.TEA_SHRUB, new Item.Properties());
     public static final Item STEAMER = new BlockItem(TTBlocks.STEAMER, new Item.Properties());
+    public static final Item TEA_KETTLE = new TeaKettleItem(TTBlocks.TEA_KETTLE, new Item.Properties());
+    public static final Item TEA_MUG = new TeaMugItem(TTBlocks.TEA_MUG, PDItems.MUG, 10.0, new Item.Properties().stacksTo(1));
 
     private static void register(String id, Item item) {
         Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(TeaTime.MOD_ID, id), item);
@@ -43,6 +46,8 @@ public class TTItems {
         register("tea", TEA);
         register("tea_seeds", TEA_SEEDS);
         register("steamer", STEAMER);
+        register("tea_kettle", TEA_KETTLE);
+        register("tea_mug", TEA_MUG);
     }
 
 }

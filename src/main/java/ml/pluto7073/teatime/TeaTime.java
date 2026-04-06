@@ -3,7 +3,7 @@ package ml.pluto7073.teatime;
 import ml.pluto7073.pdapi.item.PDItems;
 import ml.pluto7073.teatime.action.TeaTimeActions;
 import ml.pluto7073.teatime.block.TTBlocks;
-import ml.pluto7073.teatime.block.entity.ModBlockEntityTypes;
+import ml.pluto7073.teatime.block.entity.TTBlockEntityTypes;
 import ml.pluto7073.teatime.entity.TTTrackedData;
 import ml.pluto7073.teatime.event.TTEvents;
 import ml.pluto7073.teatime.gui.handlers.TTMenuTypes;
@@ -13,10 +13,13 @@ import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaSpecialtyBase;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -34,12 +37,13 @@ public class TeaTime implements ModInitializer {
     public static final String MOD_ID = "teatime";
     public static final Logger logger = LogManager.getLogger("TeaTime");
     public static ResourceKey<CreativeModeTab> TT_GROUP;
+    public static final TeaTypeManager SERVER_TEA_TYPE_MANAGER = new TeaTypeManager();
 
     @Override
     public void onInitialize() {
         TeaSpecialtyBase.init();
         TTBlocks.init();
-        ModBlockEntityTypes.init();
+        TTBlockEntityTypes.init();
         TTRecipes.init();
         TTItems.init();
         TeaTypeManager.init();
@@ -67,14 +71,20 @@ public class TeaTime implements ModInitializer {
                     stacks.acceptAll(TeaTimeUtils.getRolledLeaves());
                     stacks.accept(new ItemStack(TTItems.DRIED_TEA_LEAVES));
                     stacks.accept(new ItemStack(TTItems.FERMENTED_TEA_LEAVES));
-                    stacks.acceptAll(TeaTimeUtils.getTeaBags());
-                    stacks.acceptAll(TeaTimeUtils.getTea());
+                    stacks.accept(TTItems.TEA_KETTLE.getDefaultInstance());
+                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+                        if (Minecraft.getInstance().level != null) {
+                            stacks.acceptAll(TeaTimeUtils.getTeaBags(Minecraft.getInstance().level));
+                            stacks.acceptAll(TeaTimeUtils.getTea(Minecraft.getInstance().level));
+                            stacks.acceptAll(TeaTimeUtils.getTeaMugs(Minecraft.getInstance().level));
+                        }
+                    }
                     stacks.accept(PDItems.MILK_BOTTLE);
                 });
     }
 
     public static void registerResourceReloadListener() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new TeaTypeManager());
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(SERVER_TEA_TYPE_MANAGER);
     }
 
     public static ResourceLocation asId(String name) {

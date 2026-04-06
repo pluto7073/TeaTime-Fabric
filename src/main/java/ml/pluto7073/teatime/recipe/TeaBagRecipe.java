@@ -33,20 +33,24 @@ public class TeaBagRecipe extends CustomRecipe {
         if (!items.contains(Items.STRING) || !items.contains(Items.PAPER)) return false;
         items.remove(Items.PAPER);
         items.remove(Items.STRING);
-        return TeaTypeManager.getFromIngredients(items) != TeaTypeManager.EMPTY_TYPE;
+        return level.getTeaTypeManager().getFromIngredients(items) != TeaTypeManager.EMPTY_TYPE;
     }
 
     @Override
     public ItemStack assemble(CraftingContainer container, RegistryAccess manager) {
+        return new ItemStack(TTItems.TEA_BAG, 1);
+    }
+
+    public ItemStack assemble(CraftingContainer container, Level level) {
         List<Item> ingredients = getItems(container);
         ingredients.remove(Items.PAPER);
         ingredients.remove(Items.STRING);
         ItemStack teaBag = new ItemStack(TTItems.TEA_BAG, 1);
-        TeaType teaType = TeaTypeManager.getFromIngredients(ingredients);
+        TeaType teaType = level.getTeaTypeManager().getFromIngredients(ingredients);
         if (teaType == TeaTypeManager.EMPTY_TYPE) {
             throw new IllegalStateException("There is no teaType for ingredients: " + ingredients.stream().map(BuiltInRegistries.ITEM::getId).toList());
         }
-        return TeaTimeUtils.setTeaType(teaBag, teaType);
+        return TeaTimeUtils.setTeaType(teaBag, teaType, level);
     }
 
     @Override
