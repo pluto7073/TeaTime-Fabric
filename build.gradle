@@ -74,6 +74,18 @@ processResources {
 	}
 }
 
+tasks.register("buildOrPublish") {
+	group = "build"
+	String mavenUser = System.getenv("MAVEN_USER")
+	if (mavenUser != null && !mavenUser.isEmpty()) {
+		dependsOn(tasks.named("publish"))
+		println("Prepared to publish")
+	} else {
+		dependsOn(tasks.named("build"))
+		println("Prepared to build")
+	}
+}
+
 loom {
 	runs {
 		configureEach {
