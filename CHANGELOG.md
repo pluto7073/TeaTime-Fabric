@@ -1,4 +1,9 @@
 
+## Fixes
+- Missing texture on underside of the campfire stand model for the Tea Kettle
+
+---
+
 ## Additions
 - Added a Tea Kettle and Mugs (via PDAPI)
 - Heat a Tea Kettle over a campfire (or a stove with Farmer's Delight), add water, add tea ingredients, then pour into cups
