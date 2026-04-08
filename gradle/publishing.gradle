@@ -13,7 +13,7 @@ tasks.register("publishMod") {
     group "publishing"
     dependsOn(tasks.modrinth)
     dependsOn(tasks.githubRelease)
-    //dependsOn(tasks.curseforge) TODO get curseforge going
+    dependsOn(tasks.curseforge)
 }
 
 // Maven Publishing
@@ -57,9 +57,9 @@ githubRelease {
 // Curseforge
 
 curseforge {
-    /*apiKey = System.getenv("CURSE_TOKEN") ?: "unset"
+    apiKey = System.getenv("CURSE_TOKEN") ?: "unset"
     project {
-        id = "407793"
+        id = "821290"
         changelog = changelog_text
         releaseType = 'release'
         for (final def version in project.minecraft_dependency.split(',')) {
@@ -77,7 +77,7 @@ curseforge {
             uploadTask.dependsOn(tasks.remapJar)
         }
     }
-    curseGradleOptions.forgeGradleIntegration = false*/
+    curseGradleOptions.forgeGradleIntegration = false
 }
 
 // Modrinth
