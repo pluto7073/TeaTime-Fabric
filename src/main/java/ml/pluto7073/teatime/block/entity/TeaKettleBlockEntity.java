@@ -1,5 +1,6 @@
 package ml.pluto7073.teatime.block.entity;
 
+import com.google.common.collect.Lists;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.gui.handlers.TeaKettleMenu;
 import ml.pluto7073.teatime.item.TTItems;
@@ -34,7 +35,6 @@ import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
