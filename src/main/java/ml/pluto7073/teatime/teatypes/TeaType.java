@@ -1,5 +1,6 @@
 package ml.pluto7073.teatime.teatypes;
 
+import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.networking.NetworkingUtils;
@@ -12,7 +13,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import org.apache.commons.compress.utils.Lists;
 
 import java.util.*;
 
