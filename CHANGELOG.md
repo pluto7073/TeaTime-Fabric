@@ -1,4 +1,12 @@
 
+## Changes 
+- Updated to PDAPI 0.4.4+
+
+## Fixes
+- Fixed a bug causing dedicated servers to crash on startup (same cause as PDAPI)
+
+---
+
 ## Fixes
 - Missing texture on underside of the campfire stand model for the Tea Kettle
 

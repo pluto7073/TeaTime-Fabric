@@ -60,27 +60,6 @@ public class TeaTime implements ModInitializer {
         TT_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, asId("tt_group"));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TT_GROUP, FabricItemGroup.builder()
                 .icon(() -> new ItemStack(TTItems.TEA_LEAVES)).title(Component.translatable("itemGroup.teatime.tt_group")).build());
-        ItemGroupEvents.modifyEntriesEvent(TT_GROUP).register(stacks -> {
-                    stacks.accept(new ItemStack(TTItems.STEAMER));
-                    stacks.accept(PDItems.DRINK_WORKSTATION);
-                    stacks.accept(new ItemStack(TTItems.TEA_SEEDS));
-                    stacks.accept(new ItemStack(TTItems.TEA_LEAVES));
-                    stacks.accept(new ItemStack(TTItems.WITHERED_TEA_LEAVES));
-                    stacks.accept(new ItemStack(TTItems.WHITE_TEA_LEAVES));
-                    stacks.accept(new ItemStack(TTItems.STEAMED_TEA_LEAVES));
-                    stacks.acceptAll(TeaTimeUtils.getRolledLeaves());
-                    stacks.accept(new ItemStack(TTItems.DRIED_TEA_LEAVES));
-                    stacks.accept(new ItemStack(TTItems.FERMENTED_TEA_LEAVES));
-                    stacks.accept(TTItems.TEA_KETTLE.getDefaultInstance());
-                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-                        if (Minecraft.getInstance().level != null) {
-                            stacks.acceptAll(TeaTimeUtils.getTeaBags(Minecraft.getInstance().level));
-                            stacks.acceptAll(TeaTimeUtils.getTea(Minecraft.getInstance().level));
-                            stacks.acceptAll(TeaTimeUtils.getTeaMugs(Minecraft.getInstance().level));
-                        }
-                    }
-                    stacks.accept(PDItems.MILK_BOTTLE);
-                });
     }
 
     public static void registerResourceReloadListener() {
