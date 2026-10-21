@@ -1,4 +1,9 @@
 
+## Changes
+- Updated to PDAPI 0.5.x
+
+---
+
 ## Fixes
 - Fixed a bug where the wrong Lists class was referenced
 

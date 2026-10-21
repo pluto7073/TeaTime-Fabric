@@ -3,6 +3,7 @@ package ml.pluto7073.teatime.utils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
+import ml.pluto7073.pdapi.util.ColorUtil;
 import ml.pluto7073.pdapi.util.DrinkUtil;
 import ml.pluto7073.pdapi.addition.DrinkAddition;
 import ml.pluto7073.teatime.item.TTItems;
@@ -128,29 +129,9 @@ public final class TeaTimeUtils {
     }
 
     public static int getTeaColor(ItemStack stack, Level level) {
-        return getTeaColor(stack.getOrCreateTag(), level);
-    }
-
-    public static int getTeaColor(CompoundTag nbt, Level level) {
         int colour = 0;
-        if (getTeaType(nbt.getCompound("TeaData"), level) != null) colour = getTeaType(nbt.getCompound("TeaData"), level).getColour(level);
-        float r = (colour >> 16 & 255) / 255.0F;
-        float g = (colour >> 8 & 255) / 255.0F;
-        float b = (colour & 255) / 255.0F;
-        int colourCount = 1;
-
-        for (DrinkAddition addition : DrinkUtil.getAdditionsFromTag(nbt.getCompound(AbstractCustomizableDrinkItem.DRINK_DATA_NBT_KEY), level)) {
-            if (!addition.changesColor()) continue;
-            int additionColour = addition.getColor();
-            r += (additionColour >> 16 & 255) / 255.0F;
-            g += (additionColour >> 8 & 255) / 255.0F;
-            b += (additionColour & 255) / 255.0F;
-            colourCount += 1;
-        }
-        r = r / (float) colourCount * 255.0F;
-        g = g / (float) colourCount * 255.0F;
-        b = b / (float) colourCount * 255.0F;
-        return (int) r << 16 | (int) g << 8 | (int) b;
+        if (getTeaType(stack.getOrCreateTag().getCompound("TeaData"), level) != null) colour = getTeaType(stack.getOrCreateTag().getCompound("TeaData"), level).getColour(level);
+        return ColorUtil.getColorForDrinkWithDefault(stack, colour, 1, level);
     }
 
     static {
