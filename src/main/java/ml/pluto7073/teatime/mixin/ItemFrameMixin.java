@@ -2,6 +2,7 @@ package ml.pluto7073.teatime.mixin;
 
 import ml.pluto7073.teatime.entity.TTTrackedData;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,12 +10,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemFrame.class)
-public abstract class ItemFrameMixin extends HangingEntityMixin {
+public abstract class ItemFrameMixin extends BlockAttachedEntityMixin {
 
     @Inject(at = @At("TAIL"), method = "defineSynchedData")
-    public void teatime$initWitheringData(CallbackInfo ci) {
-        this.entityData.define(TTTrackedData.WITHERING_AGE, 0);
-        this.entityData.define(TTTrackedData.WITHERING, false);
+    public void teatime$initWitheringData(SynchedEntityData.Builder builder, CallbackInfo ci) {
+        builder.define(TTTrackedData.WITHERING_AGE, 0);
+        builder.define(TTTrackedData.WITHERING, false);
     }
 
     @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")

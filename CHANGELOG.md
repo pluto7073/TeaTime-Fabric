@@ -1,5 +1,10 @@
 
 ## Changes
+- Update to 1.21.1
+
+---
+
+## Changes
 - To conform with Dynamic Registries in the 1.21.1 version, custom tea types have moved from `tea_types`
 to `teatime/tea_type`
 

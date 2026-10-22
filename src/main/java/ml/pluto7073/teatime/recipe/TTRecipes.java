@@ -26,16 +26,16 @@ public class TTRecipes {
     public static final SpecialAdditionSerializer<TeaInLatteAdditionRecipe> TEA_IN_LATTE;
 
     private static <T extends Recipe<?>> RecipeType<T> register(final String id) {
-        return Registry.register(BuiltInRegistries.RECIPE_TYPE, new ResourceLocation(TeaTime.MOD_ID, id), new RecipeType<T>() {
+        return Registry.register(BuiltInRegistries.RECIPE_TYPE, TeaTime.asId(id), new RecipeType<T>() {
             @Override
             public String toString() {
-                return new ResourceLocation(TeaTime.MOD_ID, id).toString();
+                return TeaTime.asId(id).toString();
             }
         });
     }
 
     private static <S extends RecipeSerializer<T>, T extends Recipe<?>> S register(String id, S serializer) {
-        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(TeaTime.MOD_ID, id), serializer);
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TeaTime.asId(id), serializer);
     }
 
     static {
@@ -44,7 +44,7 @@ public class TTRecipes {
         ROLLING = register("rolling");
         //Serializers
         STEAMING_SERIALIZER = register("steaming", new SteamerRecipe.Serializer(1200));
-        ROLLING_SERIALIZER = register("rolling", new RollingRecipe.Serializer(1.0));
+        ROLLING_SERIALIZER = register("rolling", new RollingRecipe.Serializer());
         TEA_BAG_MAKING = register("crafting_special_teabagmaking", new SimpleCraftingRecipeSerializer<>(TeaBagRecipe::new));
         TEA_BREWING = register("crafting_special_teabrewing", new SimpleCraftingRecipeSerializer<>(TeaRecipe::new));
         DRIED_TEA_LEAVES = register("smelting_special_driedtealeaves", new TTSpecialRecipeSerializer<>(DriedTeaLeaves::new));

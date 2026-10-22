@@ -30,9 +30,9 @@ repositories {
 	maven { url = "https://maven.parchmentmc.org" }
 	maven { url = "https://maven.quiltmc.org/repository/release" }
 	maven { url = "https://api.modrinth.com/maven" } // Iris & Sodium
-	maven { url = "https://repo.greenhouse.house/releases/" } // Farmer's Delight
+	maven { url = "https://maven.cassian.cc" } // Farmer's Delight
 	maven { url = "https://jitpack.io/" } // ASM (Farmer's Delight)
-	maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes (Porting Lib)
+	//maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes (Porting Lib)
 	maven { url = "https://mvn.devos.one/releases/" } // Porting Lib (Farmer's Delight)
 	mavenLocal()
 }
@@ -55,10 +55,10 @@ dependencies {
 
 	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 
-	modRuntimeOnly "vectorwing:FarmersDelight:${minecraft_version}-${farmers_delight_version}+refabricated"
+	//modRuntimeOnly "vectorwing:FarmersDelight:${minecraft_version}-${farmers_delight_version}+refabricated"
 	modRuntimeOnly "ml.pluto7073:plutoscoffee:${minecraft_version}+${plutoscoffee_version}", { exclude module: "pdapi" }
-	modRuntimeOnly "maven.modrinth:iris:${iris_version}"
-	modRuntimeOnly "maven.modrinth:sodium:$sodium_version"
+	//modRuntimeOnly "maven.modrinth:iris:${iris_version}"
+	//modRuntimeOnly "maven.modrinth:sodium:$sodium_version"
 	modRuntimeOnly("org.antlr:antlr4-runtime:4.13.1")
 	modRuntimeOnly("io.github.douira:glsl-transformer:2.0.1")
 	modRuntimeOnly("org.anarres:jcpp:1.4.14")

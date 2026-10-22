@@ -1,35 +1,32 @@
 package ml.pluto7073.teatime.recipe;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.teatime.event.RollTeaLeaves;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
 @MethodsReturnNonnullByDefault
-public class RollingRecipe implements Recipe<Container> {
+@ParametersAreNonnullByDefault
+public class RollingRecipe implements Recipe<SingleRecipeInput> {
 
-    protected final ResourceLocation id;
     protected final Ingredient starting;
     protected final ItemStack ending;
     protected final double chance;
 
     private final Random random;
 
-    public RollingRecipe(ResourceLocation id, Ingredient starting, ItemStack ending, double chance) {
-        this.id = id;
+    public RollingRecipe(Ingredient starting, ItemStack ending, double chance) {
         this.starting = starting;
         this.ending = ending;
         this.chance = chance;
@@ -37,17 +34,13 @@ public class RollingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container container, Level level) {
+    public boolean matches(SingleRecipeInput container, Level level) {
         ItemStack stack = container.getItem(0);
         return starting.test(stack);
     }
 
     @Override
-    public ItemStack assemble(Container container, RegistryAccess manager) {
-        return craft(container);
-    }
-
-    public ItemStack craft(Container inventory) {
+    public ItemStack assemble(SingleRecipeInput container, HolderLookup.Provider manager) {
         double r = random.nextDouble();
         if (r <= chance) {
             return ending;
@@ -62,13 +55,8 @@ public class RollingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess manager) {
+    public ItemStack getResultItem(HolderLookup.Provider manager) {
         return ending;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -83,40 +71,30 @@ public class RollingRecipe implements Recipe<Container> {
 
     public static class Serializer implements RecipeSerializer<RollingRecipe> {
 
-        private final double chance;
+        public static final MapCodec<RollingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(Ingredient.CODEC.fieldOf("starting").forGetter(r -> r.starting),
+                                ItemStack.CODEC.fieldOf("ending").forGetter(r -> r.ending),
+                                Codec.DOUBLE.fieldOf("chance").orElse(1.0).forGetter(r -> r.chance))
+                        .apply(instance, RollingRecipe::new));
+        public static final StreamCodec<RegistryFriendlyByteBuf, RollingRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.starting,
+                ItemStack.STREAM_CODEC, r -> r.ending,
+                ByteBufCodecs.DOUBLE, r -> r.chance,
+                RollingRecipe::new
+        );
 
-        public Serializer(double chance) {
-            this.chance = chance;
+        public Serializer() {
         }
 
         @Override
-        public RollingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            Ingredient starting = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "starting"));
-            JsonObject resultData = GsonHelper.getAsJsonObject(json, "ending");
-            String endingItemId = GsonHelper.getAsString(resultData, "item");
-            String mod = GsonHelper.getAsString(resultData, "mod", "teatime:default");
-            ItemStack ending = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(endingItemId)), 1);
-            ending.getOrCreateTagElement("TeaData").putString("mod", mod);
-            double chance = GsonHelper.getAsDouble(json, "chance", this.chance);
-
-            return new RollingRecipe(id, starting, ending, chance);
+        public MapCodec<RollingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public RollingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            Ingredient starting = Ingredient.fromNetwork(buf);
-            ItemStack ending = buf.readItem();
-            double chance = buf.readDouble();
-            return new RollingRecipe(id, starting, ending, chance);
+        public StreamCodec<RegistryFriendlyByteBuf, RollingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, RollingRecipe recipe) {
-            recipe.starting.toNetwork(buf);
-            buf.writeItem(recipe.ending);
-            buf.writeDouble(recipe.chance);
-        }
-
     }
 
 }

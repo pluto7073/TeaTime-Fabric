@@ -1,21 +1,22 @@
 package ml.pluto7073.teatime.recipe.special;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CookingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public abstract class SpecialSmeltingRecipe extends SmeltingRecipe {
 
-    public SpecialSmeltingRecipe(ResourceLocation id, CookingBookCategory category) {
-        super(id, "", category, Ingredient.EMPTY, ItemStack.EMPTY, 0, 200);
+    public SpecialSmeltingRecipe(CookingBookCategory category) {
+        super("", category, Ingredient.EMPTY, ItemStack.EMPTY, 0, 200);
     }
 
     @Override
@@ -27,7 +28,7 @@ public abstract class SpecialSmeltingRecipe extends SmeltingRecipe {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess manager) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
@@ -35,8 +36,8 @@ public abstract class SpecialSmeltingRecipe extends SmeltingRecipe {
     public abstract RecipeSerializer<?> getSerializer();
 
     @Override
-    public abstract boolean matches(Container container, Level world);
+    public abstract boolean matches(SingleRecipeInput container, Level world);
 
     @Override
-    public abstract ItemStack assemble(Container container, RegistryAccess manager);
+    public abstract ItemStack assemble(SingleRecipeInput container, HolderLookup.Provider provider);
 }

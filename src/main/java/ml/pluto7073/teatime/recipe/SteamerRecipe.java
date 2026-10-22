@@ -1,17 +1,15 @@
 package ml.pluto7073.teatime.recipe;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.teatime.block.TTBlocks;
-import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -19,17 +17,18 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-@MethodsReturnNonnullByDefault
-public class SteamerRecipe implements Recipe<Container> {
+import javax.annotation.ParametersAreNonnullByDefault;
 
-    protected final ResourceLocation id;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+public class SteamerRecipe implements Recipe<SteamerRecipeInput> {
+
     protected final String group;
     protected final Ingredient input;
     public final ItemStack output;
     protected final int steamTime;
 
-    public SteamerRecipe(ResourceLocation id, String group, Ingredient input, ItemStack output, int steamTime) {
-        this.id = id;
+    public SteamerRecipe(String group, Ingredient input, ItemStack output, int steamTime) {
         this.group = group;
         this.input = input;
         this.output = output;
@@ -37,12 +36,12 @@ public class SteamerRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container container, Level level) {
-        return this.input.test(container.getItem(SteamerBlockEntity.INPUT_SLOT_INDEX));
+    public boolean matches(SteamerRecipeInput container, Level level) {
+        return this.input.test(container.input());
     }
 
     @Override
-    public ItemStack assemble(Container container, RegistryAccess manager) {
+    public ItemStack assemble(SteamerRecipeInput container, HolderLookup.Provider manager) {
         return this.output.copy();
     }
 
@@ -59,13 +58,8 @@ public class SteamerRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess manager) {
+    public ItemStack getResultItem(HolderLookup.Provider manager) {
         return this.output;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.id;
     }
 
     @Override
@@ -94,6 +88,20 @@ public class SteamerRecipe implements Recipe<Container> {
 
     public static class Serializer implements RecipeSerializer<SteamerRecipe> {
 
+        public static final MapCodec<SteamerRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(Codec.STRING.fieldOf("group").orElse("").forGetter(recipe -> recipe.group),
+                        Ingredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.input),
+                        ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.output),
+                        Codec.INT.fieldOf("steamtime").orElse(200).forGetter(recipe -> recipe.steamTime))
+                        .apply(instance, SteamerRecipe::new));
+        public static final StreamCodec<RegistryFriendlyByteBuf, SteamerRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, SteamerRecipe::getGroup,
+                Ingredient.CONTENTS_STREAM_CODEC, recipe -> recipe.input,
+                ItemStack.STREAM_CODEC, recipe -> recipe.output,
+                ByteBufCodecs.INT, recipe -> recipe.steamTime,
+                SteamerRecipe::new
+        );
+
         private final int steamTime;
 
         public Serializer(int steamTime) {
@@ -101,33 +109,13 @@ public class SteamerRecipe implements Recipe<Container> {
         }
 
         @Override
-        public SteamerRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = GsonHelper.getAsString(json, "group", "");
-            JsonElement ingredientJson = GsonHelper.isArrayNode(json, "ingredient") ?
-                    GsonHelper.getAsJsonArray(json, "ingredient") : GsonHelper.getAsJsonObject(json, "ingredient");
-            Ingredient input = Ingredient.fromJson(ingredientJson);
-            ResourceLocation resultId = new ResourceLocation(GsonHelper.getAsString(json, "result"));
-            ItemStack result = new ItemStack(BuiltInRegistries.ITEM.getOptional(resultId).orElseThrow(() ->
-                    new IllegalStateException("Item: " + resultId + " does not exist")));
-            int time = GsonHelper.getAsInt(json, "steamtime", this.steamTime);
-            return new SteamerRecipe(id, group, input, result, time);
+        public MapCodec<SteamerRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public SteamerRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-            Ingredient input = Ingredient.fromNetwork(buf);
-            ItemStack result = buf.readItem();
-            int time = buf.readVarInt();
-            return new SteamerRecipe(id, group, input, result, time);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, SteamerRecipe recipe) {
-            buf.writeUtf(recipe.group);
-            recipe.input.toNetwork(buf);
-            buf.writeItem(recipe.output);
-            buf.writeVarInt(recipe.steamTime);
+        public StreamCodec<RegistryFriendlyByteBuf, SteamerRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 

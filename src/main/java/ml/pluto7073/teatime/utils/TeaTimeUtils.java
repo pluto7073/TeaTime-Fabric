@@ -1,129 +1,105 @@
 package ml.pluto7073.teatime.utils;
 
+import com.google.common.collect.Streams;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Encoder;
 import ml.pluto7073.pdapi.util.ColorUtil;
+import ml.pluto7073.pdapi.util.DrinkUtil;
+import ml.pluto7073.teatime.TeaTime;
+import ml.pluto7073.teatime.component.TTComponents;
+import ml.pluto7073.teatime.item.RolledTeaLeavesItem;
 import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypeManager;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public final class TeaTimeUtils {
 
-    public static final Map<String, Item> DRYING_RESULTS = new HashMap<>();
+    public static final Map<ResourceLocation, Item> DRYING_RESULTS = new HashMap<>();
     public static final int MAX_TIME_DRYING = 200;
 
     public static List<ItemStack> getRolledLeaves() {
         List<ItemStack> stacks = new ArrayList<>();
-        for (String s : DRYING_RESULTS.keySet()) {
+        for (ResourceLocation source : DRYING_RESULTS.keySet()) {
             ItemStack stack = new ItemStack(TTItems.ROLLED_TEA_LEAVES);
-            stack.getOrCreateTagElement("TeaData").putString("mod", s);
+            stack.set(TTComponents.ROLLED_TEA_LEAVES_SOURCE, source);
             stacks.add(stack);
         }
         return stacks;
     }
 
-    public static List<ItemStack> getTeaBags(Level level) {
+    public static List<ItemStack> getTeaBags(Registry<TeaType> registry) {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack stack = new ItemStack(TTItems.TEA_BAG);
-        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
-            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(stack.copy(), level.getTeaTypeManager().get(i), level));
+        for (Holder<TeaType> i : TeaType.getOrderedIdListDisplayed(registry)) {
+            stack.set(TTComponents.TEA_TYPE, i);
+            stacks.add(stack.copy());
         }
         return stacks;
     }
 
-    public static List<ItemStack> getTea(Level level) {
+    public static List<ItemStack> getTea(Registry<TeaType> registry) {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack tea = new ItemStack(TTItems.TEA, 1);
-        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
-            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(tea.copy(), level.getTeaTypeManager().get(i), level));
+        for (Holder<TeaType> i : TeaType.getOrderedIdListDisplayed(registry)) {
+            tea.set(TTComponents.TEA_TYPE, i);
+            stacks.add(tea.copy());
         }
         return stacks;
     }
 
-    public static List<ItemStack> getTeaMugs(Level level) {
+    public static List<ItemStack> getTeaMugs(Registry<TeaType> registry) {
         List<ItemStack> stacks = new ArrayList<>();
         ItemStack tea = new ItemStack(TTItems.TEA_MUG, 1);
-        for (ResourceLocation i : level.getTeaTypeManager().getOrderedIdListDisplayed()) {
-            if (i.equals(new ResourceLocation("teatime:empty"))) continue;
-            stacks.add(setTeaType(tea.copy(), level.getTeaTypeManager().get(i), level));
+        for (Holder<TeaType> i : TeaType.getOrderedIdListDisplayed(registry)) {
+            tea.set(TTComponents.TEA_TYPE, i);
+            stacks.add(tea.copy());
         }
         return stacks;
     }
 
     public static Item getDryingResult(ItemStack stack) {
-        String mod = stack.getOrCreateTagElement("TeaData").contains("mod") ?
-                stack.getOrCreateTagElement("TeaData").getString("mod") : "teatime:null";
-        return DRYING_RESULTS.getOrDefault(mod, TTItems.ROLLED_TEA_LEAVES);
+        ResourceLocation source = stack.getOrDefault(TTComponents.ROLLED_TEA_LEAVES_SOURCE, RolledTeaLeavesItem.DEFAULT_SOURCE);
+        return DRYING_RESULTS.getOrDefault(source, TTItems.ROLLED_TEA_LEAVES);
     }
 
     public static boolean hasDryingResult(ItemStack stack) {
-        String mod = stack.getOrCreateTagElement("TeaData").contains("mod") ?
-                stack.getOrCreateTagElement("TeaData").getString("mod") : "teatime:null";
-        return DRYING_RESULTS.containsKey(mod);
+        return DRYING_RESULTS.containsKey(stack.get(TTComponents.ROLLED_TEA_LEAVES_SOURCE));
     }
 
-    public static String getRolledTooltip(ItemStack stack) {
-        String mod = stack.getOrCreateTagElement("TeaData").getString("mod");
-        Item result = DRYING_RESULTS.get(mod);
+    public static String getRolledTooltip(ResourceLocation source) {
+        Item result = DRYING_RESULTS.get(source);
         if (result == null) return "";
         return result.getDescriptionId();
-    }
-
-    public static String getTeaTypeStr(ItemStack stack) {
-        return stack.getOrCreateTagElement("TeaData").contains("type") ? stack.getOrCreateTagElement("TeaData").getString("type") : "teatime:empty";
-    }
-
-    public static TeaType getTeaType(ItemStack stack, Level level) {
-        return getTeaType(stack.getOrCreateTagElement("TeaData"), level);
-    }
-
-    public static TeaType getTeaType(CompoundTag teaData, Level level) {
-        String type = teaData.contains("type") ? teaData.getString("type") : "teatime:empty";
-        return level.getTeaTypeManager().containsId(new ResourceLocation(type)) ? level.getTeaTypeManager().get(new ResourceLocation(type)) : TeaTypeManager.EMPTY_TYPE;
-    }
-
-    public static ResourceLocation getTeaTypeId(ItemStack stack) {
-        return new ResourceLocation(stack.getOrCreateTagElement("TeaData").getString("type"));
-    }
-
-    public static ItemStack setTeaType(ItemStack stack, TeaType type, Level level) {
-        return setTeaType(stack, level.getTeaTypeManager().getId(type));
-    }
-
-    public static ItemStack setTeaType(ItemStack stack, ResourceLocation teaId) {
-        stack.getOrCreateTagElement("TeaData").putString("type", teaId.toString());
-        return stack;
-    }
-
-    public static ItemStack setTeaType(ItemStack stack, ResourceKey<TeaType> id) {
-        return setTeaType(stack, id.location());
     }
 
     public static <T> T create(Supplier<T> supplier) {
         return supplier.get();
     }
 
-    public static int getTeaColor(ItemStack stack, Level level) {
+    public static int getTeaColor(ItemStack stack, HolderLookup.Provider provider) {
         int colour = 0;
-        if (getTeaType(stack.getOrCreateTag().getCompound("TeaData"), level) != null) colour = getTeaType(stack.getOrCreateTag().getCompound("TeaData"), level).getColour(level);
-        return ColorUtil.getColorForDrinkWithDefault(stack, colour, 1, level);
+        Holder<TeaType> type = stack.get(TTComponents.TEA_TYPE);
+        if (type != null)
+            colour = type.value().getColour(provider);
+        return ColorUtil.getColorForDrinkWithDefault(stack, colour, 1);
     }
 
     static {
-        DRYING_RESULTS.put("teatime:steamed", TTItems.FERMENTED_TEA_LEAVES);
-        DRYING_RESULTS.put("teatime:withered", TTItems.DRIED_TEA_LEAVES);
+        DRYING_RESULTS.put(TeaTime.asId("steamed"), TTItems.FERMENTED_TEA_LEAVES);
+        DRYING_RESULTS.put(TeaTime.asId("withered"), TTItems.DRIED_TEA_LEAVES);
     }
 
 }

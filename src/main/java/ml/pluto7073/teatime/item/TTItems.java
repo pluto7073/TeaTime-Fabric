@@ -3,6 +3,8 @@ package ml.pluto7073.teatime.item;
 import ml.pluto7073.pdapi.item.PDItems;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.block.TTBlocks;
+import ml.pluto7073.teatime.component.TTComponents;
+import ml.pluto7073.teatime.teatypes.TeaType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -16,18 +18,18 @@ public class TTItems {
     public static final Item WITHERED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item WHITE_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item STEAMED_TEA_LEAVES = new Item(new Item.Properties());
-    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeavesItem(new Item.Properties());
+    public static final Item ROLLED_TEA_LEAVES = new RolledTeaLeavesItem(new Item.Properties().component(TTComponents.ROLLED_TEA_LEAVES_SOURCE, RolledTeaLeavesItem.DEFAULT_SOURCE));
     public static final Item FERMENTED_TEA_LEAVES = new Item(new Item.Properties());
     public static final Item DRIED_TEA_LEAVES = new Item(new Item.Properties());
-    public static final Item TEA_BAG = new TeaBagItem(new Item.Properties());
-    public static final Item TEA = new TeaItem(new Item.Properties().stacksTo(1));
+    public static final Item TEA_BAG = new TeaBagItem(new Item.Properties().component(TTComponents.TEA_TYPE, TeaType.EMPTY));
+    public static final Item TEA = new TeaItem(new Item.Properties().stacksTo(1).component(TTComponents.TEA_TYPE, TeaType.EMPTY));
     public static final Item TEA_SEEDS = new ItemNameBlockItem(TTBlocks.TEA_SHRUB, new Item.Properties());
     public static final Item STEAMER = new BlockItem(TTBlocks.STEAMER, new Item.Properties());
-    public static final Item TEA_KETTLE = new TeaKettleItem(TTBlocks.TEA_KETTLE, new Item.Properties());
-    public static final Item TEA_MUG = new TeaMugItem(TTBlocks.TEA_MUG, PDItems.MUG, 10.0, new Item.Properties().stacksTo(1));
+    public static final Item TEA_KETTLE = new TeaKettleItem(TTBlocks.TEA_KETTLE, new Item.Properties().component(TTComponents.KETTLE_DATA, KettleData.EMPTY));
+    public static final Item TEA_MUG = new TeaMugItem(TTBlocks.TEA_MUG, PDItems.MUG, 10.0, new Item.Properties().stacksTo(1).component(TTComponents.TEA_TYPE, TeaType.EMPTY));
 
     private static void register(String id, Item item) {
-        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(TeaTime.MOD_ID, id), item);
+        Registry.register(BuiltInRegistries.ITEM, TeaTime.asId(id), item);
     }
 
     private static void register(ResourceLocation id, Item item) {

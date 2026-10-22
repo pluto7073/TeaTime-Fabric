@@ -6,14 +6,19 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapelessDisplay;
 import ml.pluto7073.pdapi.PDAPI;
+import ml.pluto7073.teatime.TTRegistries;
+import ml.pluto7073.teatime.component.TTComponents;
 import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 
 import java.util.ArrayList;
@@ -27,12 +32,13 @@ public class TeaREI implements REIClientPlugin {
     public void registerDisplays(DisplayRegistry registry) {
         List<ItemStack> bags = new ArrayList<>();
         if (Minecraft.getInstance().level == null) return;
-        for (TeaType tea : Minecraft.getInstance().level.getTeaTypeManager().values()) {
-            if (Objects.equals(Minecraft.getInstance().level.getTeaTypeManager().getId(tea), PDAPI.asId("herbal"))) continue;
-            List<Item> ingredients = Lists.newArrayList(tea.getIngredients(Minecraft.getInstance().level.getTeaTypeManager()).iterator());
+        for (Reference<TeaType> tea : Minecraft.getInstance().level.registryAccess().registryOrThrow(TTRegistries.TEA_TYPE).holders().toList()) {
+            if (Objects.equals(tea.key().location(), PDAPI.asId("herbal"))) continue;
+            List<Item> ingredients = Lists.newArrayList(tea.value().getIngredients(Minecraft.getInstance().level.registryAccess()).iterator());
             ingredients.add(0, Items.STRING);
             ingredients.add(0, Items.PAPER);
-            ItemStack teaBag = TeaTimeUtils.setTeaType(new ItemStack(TTItems.TEA_BAG), tea, Minecraft.getInstance().level);
+            ItemStack teaBag = new ItemStack(TTItems.TEA_BAG);
+            teaBag.set(TTComponents.TEA_TYPE, tea);
             bags.add(teaBag);
             DefaultCustomShapelessDisplay display = DefaultCustomShapelessDisplay.simple(
                     ingredients.stream().map(EntryIngredients::of).toList(),
@@ -43,7 +49,7 @@ public class TeaREI implements REIClientPlugin {
         }
 
         ItemStack water = new ItemStack(Items.POTION);
-        PotionUtils.setPotion(water, Potions.WATER);
+        water.set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER));
         registry.add(DefaultCustomShapelessDisplay.simple(
                 List.of(
                         EntryIngredients.of(water),

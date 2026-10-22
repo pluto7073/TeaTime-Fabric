@@ -1,13 +1,12 @@
 package ml.pluto7073.teatime.mixin;
 
-import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.recipe.DriedTeaLeaves;
 import ml.pluto7073.teatime.recipe.DriedTeaLeavesBlasting;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,12 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class AbstractFurnaceEntityMixin {
 
     @Inject(at = @At("RETURN"), method = "canBurn", cancellable = true)
-    private static void teatime_isRecipeTeaLeaf(RegistryAccess registryAccess, @Nullable Recipe<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize, CallbackInfoReturnable<Boolean> cir) {
+    private static void teatime_isRecipeTeaLeaf(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize, CallbackInfoReturnable<Boolean> cir) {
         if (inventory.get(0).isEmpty() || recipe == null) {
             cir.setReturnValue(false);
             return;
         }
-        if (recipe instanceof DriedTeaLeaves dtlRecipe) {
+        if (recipe.value() instanceof DriedTeaLeaves dtlRecipe) {
             ItemStack input = inventory.get(0);
             if (!TeaTimeUtils.hasDryingResult(input)) {
                 return;
@@ -41,7 +40,7 @@ public abstract class AbstractFurnaceEntityMixin {
             } else {
                 cir.setReturnValue(outSlot.getCount() < output.getMaxStackSize());
             }
-        } else if (recipe instanceof DriedTeaLeavesBlasting dtlBlasting) {
+        } else if (recipe.value() instanceof DriedTeaLeavesBlasting dtlBlasting) {
             ItemStack input = inventory.get(0);
             if (!TeaTimeUtils.hasDryingResult(input)) {
                 return;
@@ -62,8 +61,8 @@ public abstract class AbstractFurnaceEntityMixin {
     }
 
     @Inject(at = @At("HEAD"), method = "burn", cancellable = true)
-    private static void teatime_craftTeaLeaves(RegistryAccess registryAccess, @Nullable Recipe<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize, CallbackInfoReturnable<Boolean> cir) {
-        if (recipe instanceof DriedTeaLeaves dtlRecipe) {
+    private static void teatime_craftTeaLeaves(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipe, NonNullList<ItemStack> inventory, int maxStackSize, CallbackInfoReturnable<Boolean> cir) {
+        if (recipe != null && recipe.value() instanceof DriedTeaLeaves dtlRecipe) {
             ItemStack output = dtlRecipe.craft(inventory);
             ItemStack outputSlot = inventory.get(2);
             if (outputSlot.isEmpty()) {
@@ -73,7 +72,7 @@ public abstract class AbstractFurnaceEntityMixin {
             }
             inventory.get(0).shrink(1);
             cir.setReturnValue(true);
-        } else if (recipe instanceof DriedTeaLeavesBlasting dtlBlasting) {
+        } else if (recipe != null && recipe.value() instanceof DriedTeaLeavesBlasting dtlBlasting) {
             ItemStack output = dtlBlasting.craft(inventory);
             ItemStack outputSlot = inventory.get(2);
             if (outputSlot.isEmpty()) {

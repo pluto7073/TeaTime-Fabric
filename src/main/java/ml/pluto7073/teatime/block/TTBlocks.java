@@ -12,18 +12,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
 public class TTBlocks {
 
-    public static final Block TEA_SHRUB = new TeaShrub(FabricBlockSettings.create().mapColor(MapColor.COLOR_GREEN).noCollision().ticksRandomly().breakInstantly().sounds(SoundType.CROP).pistonBehavior(PushReaction.DESTROY));
-    public static final Block STEAMER = new SteamerBlock(FabricBlockSettings.create().mapColor(MapColor.COLOR_GRAY).requiresTool().strength(0.5F).nonOpaque());
-    public static final Block TEA_KETTLE = new TeaKettleBlock(BlockBehaviour.Properties.of().noOcclusion().strength(0, 0).instabreak().mapColor(MapColor.COLOR_GRAY));
-    public static final Block TEA_MUG = new MugBlock(() -> TTBlockEntityTypes.TEA_MUG, BlockBehaviour.Properties.copy(PDBlocks.MUG));
+    public static final Block TEA_SHRUB = new TeaShrub(Properties.of().mapColor(MapColor.COLOR_GREEN).noCollission().randomTicks().instabreak().sound(SoundType.CROP).pushReaction(PushReaction.DESTROY));
+    public static final Block STEAMER = new SteamerBlock(Properties.of().mapColor(MapColor.COLOR_GRAY).requiresCorrectToolForDrops().strength(0.5F).noOcclusion());
+    public static final Block TEA_KETTLE = new TeaKettleBlock(Properties.of().noOcclusion().strength(0, 0).instabreak().mapColor(MapColor.COLOR_GRAY));
+    public static final Block TEA_MUG = new MugBlock(() -> TTBlockEntityTypes.TEA_MUG, Properties.ofFullCopy(PDBlocks.MUG));
 
     private static void register(String id, Block block) {
-        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(TeaTime.MOD_ID, id), block);
+        Registry.register(BuiltInRegistries.BLOCK, TeaTime.asId(id), block);
     }
 
     public static void init() {

@@ -3,6 +3,8 @@
   "ingredient": {
     "item": "teatime:withered_tea_leaves"
   },
-  "result": "teatime:steamed_tea_leaves",
+  "result": {
+    "id": "teatime:steamed_tea_leaves"
+  },
   "steamtime": 200
 }

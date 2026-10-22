@@ -1,22 +1,15 @@
 package ml.pluto7073.teatime.item;
 
-import com.google.common.collect.Lists;
 import ml.pluto7073.pdapi.block.PDBlocks;
 import ml.pluto7073.pdapi.item.PDItems;
 import ml.pluto7073.teatime.block.TTBlocks;
 import ml.pluto7073.teatime.block.entity.TeaMugBlockEntity;
+import ml.pluto7073.teatime.component.TTComponents;
 import ml.pluto7073.teatime.teatypes.TeaType;
-import ml.pluto7073.teatime.teatypes.TeaTypeManager;
-import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -41,19 +34,12 @@ public class TeaKettleItem extends BlockItem {
     }
 
     @Override
-    public ItemStack getDefaultInstance() {
-        ItemStack stack = new ItemStack(this);
-        resetTag(stack.getOrCreateTag());
-        return stack;
-    }
-
-    @Override
     public UseAnim getUseAnimation(ItemStack stack) {
         return UseAnim.EAT;
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 16;
     }
 
@@ -61,7 +47,8 @@ public class TeaKettleItem extends BlockItem {
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         ItemStack kettle = user.getItemInHand(hand);
         ItemStack opposite = user.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-        if (getWaterAmount(kettle) >= 250 && getTeaType(kettle) != TeaTypeManager.EMPTY && (opposite.is(Items.GLASS_BOTTLE) || opposite.is(PDItems.MUG))) {
+        KettleData data = kettle.getOrDefault(TTComponents.KETTLE_DATA, KettleData.EMPTY);
+        if (data.waterAmount() >= 250 && data.teaType() != TeaType.EMPTY && (opposite.is(Items.GLASS_BOTTLE) || opposite.is(PDItems.MUG))) {
             return ItemUtils.startUsingInstantly(world, user, hand);
         }
 
@@ -88,7 +75,8 @@ public class TeaKettleItem extends BlockItem {
         BlockPos pos = context.getClickedPos();
         BlockState state = context.getLevel().getBlockState(pos);
         if (!state.is(PDBlocks.MUG)) return InteractionResult.PASS;
-        int water = getWaterAmount(context.getItemInHand());
+        KettleData kettle = context.getItemInHand().getOrDefault(TTComponents.KETTLE_DATA, KettleData.EMPTY);
+        int water = kettle.waterAmount();
         if (water <= 0) {
             return InteractionResult.PASS;
         }
@@ -96,11 +84,12 @@ public class TeaKettleItem extends BlockItem {
         BlockState newState = TTBlocks.TEA_MUG.withPropertiesOf(state);
         context.getLevel().setBlock(pos, newState, Block.UPDATE_ALL);
         TeaMugBlockEntity mug = new TeaMugBlockEntity(pos, newState);
-        mug.setTeaType(getTeaType(context.getItemInHand()));
+        mug.setTeaType(kettle.teaType());
         context.getLevel().setBlockEntity(mug);
-        setWaterAmount(context.getItemInHand(), water - 250);
-        if (water - 250 <= 0) {
-            resetTag(context.getItemInHand().getOrCreateTag());
+        water -= 250;
+        context.getItemInHand().set(TTComponents.KETTLE_DATA, kettle.copyWithWater(water));
+        if (water <= 0) {
+            context.getItemInHand().set(TTComponents.KETTLE_DATA, KettleData.EMPTY);
         }
         return InteractionResult.CONSUME;
     }
@@ -111,70 +100,31 @@ public class TeaKettleItem extends BlockItem {
             return stack;
         }
 
+        KettleData kettle = stack.getOrDefault(TTComponents.KETTLE_DATA, KettleData.EMPTY);
+
         InteractionHand hand = user.getUsedItemHand();
         ItemStack opposite = user.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
         Item teaInstanceItem = opposite.is(Items.GLASS_BOTTLE) ? TTItems.TEA : TTItems.TEA_MUG;
         ItemStack newStack = teaInstanceItem.getDefaultInstance();
-        TeaTimeUtils.setTeaType(newStack, getTeaType(stack).location());
-        setWaterAmount(stack, getWaterAmount(stack) - 250);
-        if (getWaterAmount(stack) <= 0) {
-            resetTag(stack.getOrCreateTag());
+        newStack.set(TTComponents.TEA_TYPE, kettle.teaType());
+        int water = kettle.waterAmount() - 250;
+        stack.set(TTComponents.KETTLE_DATA, kettle.copyWithWater(water));
+        if (water <= 0) {
+            stack.set(TTComponents.KETTLE_DATA, KettleData.EMPTY);
         }
         user.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND, newStack);
 
         return stack;
     }
 
-    public static int getWaterAmount(ItemStack kettle) {
-        if (kettle.getTag() == null || kettle.getTag().isEmpty()) {
-            resetTag(kettle.getOrCreateTag());
-        }
-        return kettle.getOrCreateTag().getInt("Water");
-    }
-
-    public static void setWaterAmount(ItemStack kettle, int waterAmount) {
-        if (kettle.getTag() == null || kettle.getTag().isEmpty()) {
-            resetTag(kettle.getOrCreateTag());
-        }
-        kettle.getOrCreateTag().putInt("Water", waterAmount);
-    }
-
-    public static List<ItemStack> getInsertedItems(ItemStack kettle) {
-        if (kettle.getTag() == null || kettle.getTag().isEmpty()) {
-            resetTag(kettle.getOrCreateTag());
-        }
-        ListTag list = kettle.getOrCreateTag().getList("InsertedItems", Tag.TAG_COMPOUND);
-        List<ItemStack> items = Lists.newArrayList();
-        for (Tag tag : list) {
-            if (!(tag instanceof CompoundTag item)) continue;
-            ItemStack stack = ItemStack.of(item);
-            items.add(stack);
-        }
-        return items;
-    }
-
-    public static ResourceKey<TeaType> getTeaType(ItemStack kettle) {
-        if (kettle.getTag() == null || kettle.getTag().isEmpty()) {
-            resetTag(kettle.getOrCreateTag());
-        }
-        return ResourceKey.create(TeaTypeManager.TEA_TYPE, new ResourceLocation(kettle.getOrCreateTag().getString("TeaType")));
-    }
-
-    public static void resetTag(CompoundTag tag) {
-        tag.putInt("Temperature", 15);
-        tag.put("Items", new ListTag());
-        tag.put("InsertedItems", new ListTag());
-        tag.putInt("Water", 0);
-        tag.putString("TeaType", TeaTypeManager.EMPTY.location().toString());
-    }
-
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
-        tooltip.add(Component.translatable("tooltip.teatime.kettle.water", getWaterAmount(stack)).withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.teatime.kettle.temperature", stack.getOrCreateTag().getInt("Temperature")).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        KettleData data = stack.getOrDefault(TTComponents.KETTLE_DATA, KettleData.EMPTY);
+        tooltip.add(Component.translatable("tooltip.teatime.kettle.water", data.waterAmount()).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.teatime.kettle.temperature", data.temperature()).withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.empty());
-        if (getTeaType(stack) == TeaTypeManager.EMPTY) {
-            List<ItemStack> insertedItems = getInsertedItems(stack);
+        if (data.teaType() == TeaType.EMPTY) {
+            List<ItemStack> insertedItems = data.insertedItems();
             if (!insertedItems.isEmpty()) {
                 tooltip.add(Component.translatable("tooltip.teatime.kettle.items").withStyle(ChatFormatting.GRAY));
                 for (ItemStack item : insertedItems) {
@@ -184,7 +134,7 @@ public class TeaKettleItem extends BlockItem {
                 tooltip.add(Component.translatable("tooltip.teatime.kettle.empty"));
             }
         } else {
-            tooltip.add(Component.translatable("tooltip.teatime.kettle.tea", Component.translatable(getTeaType(stack).location().toLanguageKey("tea_type"))).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.teatime.kettle.tea", Component.translatable(TeaType.getTranslationKey(data.teaType()))).withStyle(ChatFormatting.GRAY));
         }
     }
 }

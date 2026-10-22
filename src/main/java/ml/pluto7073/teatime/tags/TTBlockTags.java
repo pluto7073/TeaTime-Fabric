@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block;
 
 public class TTBlockTags {
 
-    public static final TagKey<Block> WORKSTATIONS = TagKey.create(Registries.BLOCK, new ResourceLocation("c:workstations"));
+    public static final TagKey<Block> WORKSTATIONS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "workstations"));
     public static final TagKey<Block> HEATING_BLOCKS = TagKey.create(Registries.BLOCK, TeaTime.asId("heating_blocks"));
 
 }

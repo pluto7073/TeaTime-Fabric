@@ -1,23 +1,23 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " n ",
-    "iBi",
-    " i "
+    "/C/",
+    "/i/",
+    "/ /"
   ],
   "key": {
-    "n": {
-      "item": "minecraft:iron_nugget"
+    "/": {
+      "item": "minecraft:stick"
+    },
+    "C": {
+      "item": "minecraft:chain"
     },
     "i": {
       "item": "minecraft:iron_ingot"
-    },
-    "B": {
-      "item": "minecraft:bucket"
     }
   },
   "result": {
-    "item": "teatime:tea_kettle",
+    "id": "teatime:steamer",
     "count": 1
   }
 }

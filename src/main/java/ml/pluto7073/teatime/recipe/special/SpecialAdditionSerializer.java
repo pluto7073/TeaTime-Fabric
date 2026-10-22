@@ -1,39 +1,35 @@
 package ml.pluto7073.teatime.recipe.special;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+
+import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 public class SpecialAdditionSerializer<T extends SpecialAdditionRecipe> implements RecipeSerializer<T> {
 
-    private final Factory<T> factory;
+    private final MapCodec<T> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
-    public SpecialAdditionSerializer(Factory<T> factory) {
-        this.factory = factory;
+    public SpecialAdditionSerializer(Function<ResourceLocation, T> factory) {
+        this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceLocation.CODEC.fieldOf("tea").forGetter(SpecialAdditionRecipe::result))
+                .apply(instance, factory));
+        this.streamCodec = ResourceLocation.STREAM_CODEC.map(factory, SpecialAdditionRecipe::result).cast();
     }
 
     @Override
-    public T fromJson(ResourceLocation id, JsonObject json) {
-        return this.factory.create(id, new ResourceLocation(GsonHelper.getAsString(json, "tea")));
+    public MapCodec<T> codec() {
+        return codec;
     }
 
     @Override
-    public T fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-        return this.factory.create(id, new ResourceLocation(buf.readUtf()));
-    }
-
-    @Override
-    public void toNetwork(FriendlyByteBuf buf, T recipe) {
-        buf.writeUtf(recipe.getResultId().toString());
-    }
-
-    @FunctionalInterface
-    public interface Factory<T extends SpecialAdditionRecipe> {
-        T create(ResourceLocation id, ResourceLocation type);
+    public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
+        return streamCodec;
     }
 
 }

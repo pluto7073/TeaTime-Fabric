@@ -1,16 +1,17 @@
 package ml.pluto7073.teatime.item;
 
+import ml.pluto7073.pdapi.PDAPI;
 import ml.pluto7073.pdapi.item.AbstractMugDrinkItem;
+import ml.pluto7073.teatime.component.TTComponents;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaType.MobEffectTemplate;
-import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -30,16 +31,12 @@ public class TeaMugItem extends AbstractMugDrinkItem {
     }
 
     @Override
-    public ItemStack getDefaultInstance() {
-        return TeaTimeUtils.setTeaType(super.getDefaultInstance(), TeaTypeManager.EMPTY);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
-        if (world == null) return;
-        TeaType type = TeaTimeUtils.getTeaType(stack, world);
-        tooltip.add(Component.translatable(type.getTranslationKey(world)).withStyle(ChatFormatting.GRAY));
-        super.appendHoverText(stack, world, tooltip, context);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        Holder<TeaType> type = stack.get(TTComponents.TEA_TYPE);
+        if (type != null) {
+            tooltip.add(Component.translatable(TeaType.getTranslationKey(type)).withStyle(ChatFormatting.GRAY));
+        }
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 
     @Override
@@ -47,8 +44,8 @@ public class TeaMugItem extends AbstractMugDrinkItem {
         Player entity = user instanceof Player ? (Player) user : null;
 
         if (!world.isClientSide) {
-            TeaType type = TeaTimeUtils.getTeaType(stack, world);
-            for (MobEffectTemplate template : type.getEffects(world)) {
+            Holder<TeaType> type = stack.getOrDefault(TTComponents.TEA_TYPE, TeaType.EMPTY);
+            for (MobEffectTemplate template : type.value().getEffects(world.registryAccess())) {
                 user.addEffect(template.instantiate());
             }
         }
@@ -65,7 +62,10 @@ public class TeaMugItem extends AbstractMugDrinkItem {
         if (!"pdapi:caffeine".equals(name.toString()))
             return super.getChemicalContent(name, stack, level);
         float fromAdditions = super.getChemicalContent(name, stack, level);
-        fromAdditions += TeaTimeUtils.getTeaType(stack, level).getCaffeine(level);
+        Holder<TeaType> type = stack.get(TTComponents.TEA_TYPE);
+        if (type != null) {
+            fromAdditions += type.value().getCaffeine(level.registryAccess());
+        }
         return fromAdditions;
     }
 

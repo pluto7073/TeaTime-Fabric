@@ -3,7 +3,7 @@ package ml.pluto7073.teatime.gui;
 import com.google.common.collect.Lists;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.gui.handlers.TeaKettleMenu;
-import ml.pluto7073.teatime.teatypes.TeaTypeManager;
+import ml.pluto7073.teatime.teatypes.TeaType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,7 +34,7 @@ public class TeaKettleScreen extends AbstractContainerScreen<TeaKettleMenu> {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+        this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         this.renderTooltip(context, mouseX, mouseY);
     }
@@ -55,13 +55,13 @@ public class TeaKettleScreen extends AbstractContainerScreen<TeaKettleMenu> {
                     Component.translatable("tooltip.teatime.kettle.temperature", menu.getTemperature()).withStyle(ChatFormatting.GRAY),
                     Component.empty()
             );
-            if (menu.getKettle().getTeaType() == TeaTypeManager.EMPTY) {
+            if (menu.getKettle().getTeaType() == TeaType.EMPTY) {
                 tooltip.add(Component.translatable("tooltip.teatime.kettle.items").withStyle(ChatFormatting.GRAY));
                 for (ItemStack item : menu.getKettle().getInsertedItems()) {
                     tooltip.add(item.getDisplayName());
                 }
             } else {
-                tooltip.add(Component.translatable("tooltip.teatime.kettle.tea", Component.translatable(menu.getKettle().getTeaType().location().toLanguageKey("tea_type")))
+                tooltip.add(Component.translatable("tooltip.teatime.kettle.tea", Component.translatable(TeaType.getTranslationKey(menu.getKettle().getTeaType())))
                         .withStyle(ChatFormatting.GRAY));
             }
             graphics.renderTooltip(font, tooltip, Optional.empty(), x, y);

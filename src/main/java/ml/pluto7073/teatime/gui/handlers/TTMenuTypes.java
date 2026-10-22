@@ -16,7 +16,7 @@ public class TTMenuTypes {
     public static void init() {}
 
     private static <T extends AbstractContainerMenu> MenuType<T> register(String id, MenuType.MenuSupplier<T> factory) {
-        return Registry.register(BuiltInRegistries.MENU, new ResourceLocation(TeaTime.MOD_ID, id), new MenuType<>(factory, FeatureFlags.VANILLA_SET));
+        return Registry.register(BuiltInRegistries.MENU, TeaTime.asId(id), new MenuType<>(factory, FeatureFlags.VANILLA_SET));
     }
 
 }

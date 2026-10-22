@@ -6,16 +6,12 @@
   "mixins": [
     "AbstractFurnaceEntityMixin",
     "ComposterBlockMixin",
-    "CraftingMenuMixin",
     "EntityMixin",
-    "HangingEntityMixin",
+    "BlockAttachedEntityMixin",
     "ItemFrameEntityAccessor",
-    "ItemFrameMixin",
-    "LevelMixin",
-    "ServerLevelMixin"
+    "ItemFrameMixin"
   ],
   "client": [
-    "ClientLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

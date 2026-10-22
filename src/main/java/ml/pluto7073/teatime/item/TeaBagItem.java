@@ -1,13 +1,14 @@
 package ml.pluto7073.teatime.item;
 
+import ml.pluto7073.teatime.component.TTComponents;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -19,10 +20,8 @@ public class TeaBagItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
-        if (world == null) return;
-        TeaType teaType = TeaTimeUtils.getTeaType(stack, world);
-        tooltip.add(Component.translatable(teaType.getTranslationKey(world)).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        Holder<TeaType> teaType = stack.getOrDefault(TTComponents.TEA_TYPE, TeaType.EMPTY);
+        tooltip.add(Component.translatable(TeaType.getTranslationKey(teaType)).withStyle(ChatFormatting.GRAY));
     }
-
 }

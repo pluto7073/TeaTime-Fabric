@@ -1,20 +1,18 @@
 package ml.pluto7073.teatime.recipe.special;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.BlastingRecipe;
-import net.minecraft.world.item.crafting.CookingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public abstract class SpecialBlastingRecipe extends BlastingRecipe {
-    public SpecialBlastingRecipe(ResourceLocation id, CookingBookCategory category) {
-        super(id, "", category, Ingredient.EMPTY, ItemStack.EMPTY, 0, 200);
+    public SpecialBlastingRecipe(CookingBookCategory category) {
+        super("", category, Ingredient.EMPTY, ItemStack.EMPTY, 0, 200);
     }
 
     @Override
@@ -29,13 +27,13 @@ public abstract class SpecialBlastingRecipe extends BlastingRecipe {
     public abstract RecipeSerializer<?> getSerializer();
 
     @Override
-    public abstract boolean matches(Container container, Level level);
+    public abstract boolean matches(SingleRecipeInput container, Level level);
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryManager) {
+    public ItemStack getResultItem(HolderLookup.Provider registryManager) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public abstract ItemStack assemble(Container container, RegistryAccess registryManager);
+    public abstract ItemStack assemble(SingleRecipeInput container, HolderLookup.Provider registryManager);
 }

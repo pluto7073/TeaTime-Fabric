@@ -4,8 +4,10 @@
     "item": "teatime:withered_tea_leaves"
   },
   "ending": {
-    "item": "teatime:rolled_tea_leaves",
-    "mod": "teatime:withered"
+    "id": "teatime:rolled_tea_leaves",
+    "components": {
+      "teatime:rolled_tea_leaves_source": "teatime:withered"
+    }
   },
   "chance": 0.125
 }

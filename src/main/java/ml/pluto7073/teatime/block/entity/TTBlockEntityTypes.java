@@ -16,7 +16,7 @@ public class TTBlockEntityTypes {
     public static final BlockEntityType<TeaMugBlockEntity> TEA_MUG = create("tea_mug", Builder.of(TeaMugBlockEntity::new, TTBlocks.TEA_MUG));
 
     private static <T extends BlockEntity> BlockEntityType<T> create(String id, Builder<T> builder) {
-        return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation(TeaTime.MOD_ID, id), builder.build(null));
+        return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, TeaTime.asId(id), builder.build());
     }
 
     public static void init() {}

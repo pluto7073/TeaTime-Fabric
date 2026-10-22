@@ -1,19 +1,16 @@
 package ml.pluto7073.teatime.action;
 
-import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ml.pluto7073.pdapi.addition.action.OnDrinkAction;
 import ml.pluto7073.pdapi.addition.action.OnDrinkSerializer;
-import ml.pluto7073.teatime.TeaTime;
+import ml.pluto7073.teatime.TTRegistries;
+import ml.pluto7073.teatime.component.TTComponents;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaType.MobEffectTemplate;
-import ml.pluto7073.teatime.teatypes.TeaTypeManager;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,7 +27,8 @@ public class AddTeaEffectsAction implements OnDrinkAction {
 
     @Override
     public void onDrink(ItemStack stack, Level level, LivingEntity user) {
-        List<MobEffectTemplate> list = level.getTeaTypeManager().get(type).getEffects(level);
+        List<MobEffectTemplate> list = level.registryAccess().registryOrThrow(TTRegistries.TEA_TYPE)
+                .getHolderOrThrow(type).value().getEffects(level.registryAccess());
         list.stream().map(MobEffectTemplate::instantiate).forEach(user::addEffect);
     }
 
@@ -41,25 +39,20 @@ public class AddTeaEffectsAction implements OnDrinkAction {
 
     public static class Serializer implements OnDrinkSerializer<AddTeaEffectsAction> {
 
-        public static final Codec<AddTeaEffectsAction> CODEC = RecordCodecBuilder.create(instance ->
-                instance.group(ResourceKey.codec(TeaTypeManager.TEA_TYPE).fieldOf("tea")
+        public static final MapCodec<AddTeaEffectsAction> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(ResourceKey.codec(TTRegistries.TEA_TYPE).fieldOf("tea")
                                 .forGetter(a -> a.type))
                         .apply(instance, AddTeaEffectsAction::new));
+        public static final StreamCodec<RegistryFriendlyByteBuf, AddTeaEffectsAction> STREAM_CODEC = StreamCodec.composite(
+                ResourceKey.streamCodec(TTRegistries.TEA_TYPE), a -> a.type,
+                AddTeaEffectsAction::new
+        );
 
         @Override
-        public Codec<AddTeaEffectsAction> codec() {
+        public MapCodec<AddTeaEffectsAction> codec() {
             return CODEC;
         }
 
-        @Override
-        public AddTeaEffectsAction fromNetwork(FriendlyByteBuf buf) {
-            return new AddTeaEffectsAction(buf.readResourceKey(TeaTypeManager.TEA_TYPE));
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, AddTeaEffectsAction action) {
-            buf.writeResourceKey(action.type);
-        }
     }
 
 }

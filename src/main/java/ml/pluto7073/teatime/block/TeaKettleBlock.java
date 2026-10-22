@@ -1,23 +1,22 @@
 package ml.pluto7073.teatime.block;
 
+import com.mojang.serialization.MapCodec;
 import ml.pluto7073.teatime.block.entity.TTBlockEntityTypes;
 import ml.pluto7073.teatime.block.entity.TeaKettleBlockEntity;
+import ml.pluto7073.teatime.item.KettleData;
+import ml.pluto7073.teatime.component.TTComponents;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -37,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class TeaKettleBlock extends BaseEntityBlock {
@@ -51,10 +48,16 @@ public class TeaKettleBlock extends BaseEntityBlock {
     public static final VoxelShape SHAPE_CAMPFIRE = Shapes.or(SHAPE, Block.box(0, -2, 0, 16, 0, 16),
             Block.box(0, -16, 0, 2, -2, 2), Block.box(0, -16, 14, 2, -2, 16),
             Block.box(14, -16, 14, 16, -2, 16), Block.box(14, -16, 0, 16, -2, 2));
+    private static final MapCodec<TeaKettleBlock> CODEC = simpleCodec(TeaKettleBlock::new);
 
     public TeaKettleBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(CAMPFIRE, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class TeaKettleBlock extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         if (world.getBlockEntity(pos) instanceof TeaKettleBlockEntity kettle) {
-            kettle.load(itemStack.getOrCreateTag());
+            kettle.loadFromKettleData(itemStack.getOrDefault(TTComponents.KETTLE_DATA, KettleData.EMPTY));
         }
     }
 
@@ -112,7 +115,7 @@ public class TeaKettleBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {

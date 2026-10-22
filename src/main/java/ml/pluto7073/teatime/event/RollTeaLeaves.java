@@ -12,7 +12,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
@@ -22,7 +24,7 @@ public class RollTeaLeaves {
     public static final Random RANDOM = new Random();
 
     public static void rollLeavesEvent() {
-        RecipeManager.CachedCheck<Container, ? extends RollingRecipe> matchGetter = RecipeManager.createCheck(TTRecipes.ROLLING);
+        RecipeManager.CachedCheck<SingleRecipeInput, RollingRecipe> matchGetter = RecipeManager.createCheck(TTRecipes.ROLLING);
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
             if (player == null ) {
                 return InteractionResult.PASS;
@@ -39,15 +41,14 @@ public class RollTeaLeaves {
                 return InteractionResult.PASS;
             }
 
-            SimpleContainer container = new SimpleContainer(1);
-            container.setItem(0, stack);
-            RollingRecipe recipe = matchGetter.getRecipeFor(container, level).orElse(null);
+            SingleRecipeInput input = new SingleRecipeInput(stack);
+            RecipeHolder<RollingRecipe> recipe = matchGetter.getRecipeFor(input, level).orElse(null);
 
             if (recipe == null) {
                 return InteractionResult.PASS;
             }
 
-            ItemStack result = recipe.craft(container);
+            ItemStack result = recipe.value().assemble(input, level.registryAccess());
             level.playSound(null, pos, SoundEvents.BONE_MEAL_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
             if (!result.isEmpty()) {
                 if (!level.isClientSide) {

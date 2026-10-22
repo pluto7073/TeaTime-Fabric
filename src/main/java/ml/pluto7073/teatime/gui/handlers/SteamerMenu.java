@@ -1,6 +1,8 @@
 package ml.pluto7073.teatime.gui.handlers;
 
 import ml.pluto7073.teatime.block.entity.SteamerBlockEntity;
+import ml.pluto7073.teatime.recipe.SteamerRecipe;
+import ml.pluto7073.teatime.recipe.SteamerRecipeInput;
 import ml.pluto7073.teatime.recipe.TTRecipes;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.Container;
@@ -11,12 +13,17 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static ml.pluto7073.teatime.block.entity.SteamerBlockEntity.*;
 
 @MethodsReturnNonnullByDefault
-public class SteamerMenu extends RecipeBookMenu<Container> {
+@ParametersAreNonnullByDefault
+public class SteamerMenu extends RecipeBookMenu<SteamerRecipeInput, SteamerRecipe> {
 
     private final Container container;
     private final ContainerData propertyDelegate;
@@ -66,8 +73,8 @@ public class SteamerMenu extends RecipeBookMenu<Container> {
     }
 
     @Override
-    public boolean recipeMatches(Recipe<? super Container> recipe) {
-        return recipe.matches(this.container, this.world);
+    public boolean recipeMatches(RecipeHolder<SteamerRecipe> recipe) {
+        return recipe.value().matches(new SteamerRecipeInput(container.getItem(INPUT_SLOT_INDEX)), this.world);
     }
 
     @Override
@@ -145,7 +152,7 @@ public class SteamerMenu extends RecipeBookMenu<Container> {
     }
 
     protected boolean isSteamable(ItemStack stack) {
-        return this.world.getRecipeManager().getRecipeFor(TTRecipes.STEAMING, new SimpleContainer(stack), this.world).isPresent();
+        return this.world.getRecipeManager().getRecipeFor(TTRecipes.STEAMING, new SteamerRecipeInput(stack), this.world).isPresent();
     }
 
     protected boolean isWater(ItemStack stack) {
