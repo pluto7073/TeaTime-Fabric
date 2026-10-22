@@ -191,10 +191,10 @@ public class TeaTypeManager implements SimpleSynchronousResourceReloadListener {
 
         int i = 0;
 
-        for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources("tea_types", id -> id.getPath().endsWith(".json")).entrySet()) {
+        for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources("teatime/tea_type", id -> id.getPath().endsWith(".json")).entrySet()) {
             ResourceLocation id = new ResourceLocation(entry.getKey().getNamespace(),
                     entry.getKey().getPath()
-                            .replace("tea_types/", "")
+                            .replace("teatime/tea_type/", "")
                             .replace(".json", ""));
 
             try (InputStream stream = entry.getValue().open()) {

@@ -19,9 +19,10 @@ tasks.register("publishMod") {
 // Maven Publishing
 publishing {
     repositories {
-        maven {
-            url = System.getenv("PUBLISH_LOCATION")
-        }
+//        maven {
+//            url = System.getenv("PUBLISH_LOCATION")
+//        }
+        mavenLocal()
     }
 
     publications {

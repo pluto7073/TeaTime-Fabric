@@ -1,4 +1,8 @@
 
+## Changes
+- To conform with Dynamic Registries in the 1.21.1 version, custom tea types have moved from `tea_types`
+to `teatime/tea_type`
+
 ## Fixes
 - Tea's MobEffectInstances are not reinstantiated when being applied to players, and only work once per consumption
 
