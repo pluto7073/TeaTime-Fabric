@@ -3,6 +3,7 @@ package ml.pluto7073.teatime.item;
 import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
 import ml.pluto7073.teatime.stats.TTStats;
 import ml.pluto7073.teatime.teatypes.TeaType;
+import ml.pluto7073.teatime.teatypes.TeaType.MobEffectTemplate;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import ml.pluto7073.teatime.utils.TeaTimeUtils;
 import net.minecraft.ChatFormatting;
@@ -46,8 +47,8 @@ public class TeaItem extends AbstractCustomizableDrinkItem {
 
         if (!world.isClientSide) {
             TeaType type = TeaTimeUtils.getTeaType(stack, world);
-            for (MobEffectInstance instance : type.getEffects(world)) {
-                user.addEffect(instance);
+            for (MobEffectTemplate template : type.getEffects(world)) {
+                user.addEffect(template.instantiate());
             }
         }
 

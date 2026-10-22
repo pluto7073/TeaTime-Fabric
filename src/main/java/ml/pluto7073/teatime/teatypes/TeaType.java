@@ -26,7 +26,7 @@ public class TeaType {
                                     .forGetter(type -> type.ingredients),
                             Codec.INT.fieldOf("caffeine").orElse(0)
                                     .forGetter(type -> type.caffeine),
-                            Codec.list(TeaTimeUtils.MOB_EFFECT_CODEC).fieldOf("effects")
+                            Codec.list(MobEffectTemplate.CODEC).fieldOf("effects")
                                     .forGetter(type -> type.effects),
                             Codec.BOOL.fieldOf("internal").orElse(false)
                                     .forGetter(TeaType::internal),
@@ -38,11 +38,11 @@ public class TeaType {
     private final List<Item> ingredients;
     private final int colour;
     private final int caffeine;
-    private final List<MobEffectInstance> effects;
+    private final List<MobEffectTemplate> effects;
     private final boolean internal;
     private final String name;
 
-    public TeaType(Optional<ResourceKey<TeaType>> parent, int colour, List<Item> ingredients, int caffeine, List<MobEffectInstance> effects, boolean internal, String name) {
+    public TeaType(Optional<ResourceKey<TeaType>> parent, int colour, List<Item> ingredients, int caffeine, List<MobEffectTemplate> effects, boolean internal, String name) {
         if (parent.isPresent() && internal)
             throw new IllegalStateException("Internal TeaType's can't have parents");
         this.parent = parent;
@@ -84,8 +84,8 @@ public class TeaType {
                 .orElse(caffeine);
     }
 
-    public List<MobEffectInstance> getEffects(Level level) {
-        ArrayList<MobEffectInstance> list = Lists.newArrayList(this.effects.iterator());
+    public List<MobEffectTemplate> getEffects(Level level) {
+        ArrayList<MobEffectTemplate> list = Lists.newArrayList(this.effects.iterator());
         parent.ifPresent(teaTypeResourceKey ->
                 list.addAll(level.getTeaTypeManager().get(teaTypeResourceKey).getEffects(level)));
         return list;
@@ -98,10 +98,10 @@ public class TeaType {
                 .map(BuiltInRegistries.ITEM::getKey).toArray(ResourceLocation[]::new),
                 FriendlyByteBuf::writeResourceLocation);
         buf.writeInt(caffeine);
-        NetworkingUtils.arrayToNetwork(buf, effects.toArray(MobEffectInstance[]::new), (b, instance) -> {
-            b.writeResourceLocation(BuiltInRegistries.MOB_EFFECT.getKey(instance.getEffect()));
-            b.writeInt(instance.getDuration());
-            b.writeInt(instance.getAmplifier());
+        NetworkingUtils.arrayToNetwork(buf, effects.toArray(MobEffectTemplate[]::new), (b, instance) -> {
+            b.writeResourceLocation(BuiltInRegistries.MOB_EFFECT.getKey(instance.effect()));
+            b.writeInt(instance.duration());
+            b.writeInt(instance.amplifier());
         });
         buf.writeBoolean(internal);
         buf.writeUtf(name == null ? "" : name);
@@ -114,16 +114,31 @@ public class TeaType {
         List<Item> ingredients = NetworkingUtils.listFromNetwork(buf, FriendlyByteBuf::readResourceLocation)
                 .stream().map(BuiltInRegistries.ITEM::get).toList();
         int caffeine = buf.readInt();
-        List<MobEffectInstance> effects = NetworkingUtils.listFromNetwork(buf, b -> {
+        List<MobEffectTemplate> effects = NetworkingUtils.listFromNetwork(buf, b -> {
             MobEffect effect = BuiltInRegistries.MOB_EFFECT.getOptional(b.readResourceLocation())
                     .orElseThrow();
             int duration = b.readInt();
             int amplifier = b.readInt();
-            return new MobEffectInstance(effect, duration, amplifier);
+            return new MobEffectTemplate(effect, duration, amplifier);
         });
         boolean internal = buf.readBoolean();
         String name = buf.readUtf();
         return new TeaType(parent, color, ingredients, caffeine, effects, internal, name);
+    }
+
+    public record MobEffectTemplate(MobEffect effect, int duration, int amplifier) {
+
+        public static final Codec<MobEffectTemplate> CODEC = RecordCodecBuilder.create(instance ->
+                instance.group(BuiltInRegistries.MOB_EFFECT.byNameCodec().fieldOf("effect")
+                        .forGetter(MobEffectTemplate::effect),
+                        Codec.INT.fieldOf("duration").forGetter(MobEffectTemplate::duration),
+                        Codec.INT.fieldOf("amplifier").forGetter(MobEffectTemplate::amplifier))
+                        .apply(instance, MobEffectTemplate::new));
+
+        public MobEffectInstance instantiate() {
+            return new MobEffectInstance(effect, duration, amplifier);
+        }
+
     }
 
 }

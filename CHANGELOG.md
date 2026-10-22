@@ -1,4 +1,9 @@
 
+## Fixes
+- Tea's MobEffectInstances are not reinstantiated when being applied to players, and only work once per consumption
+
+---
+
 ## Changes
 - Updated to PDAPI 0.5.x
 

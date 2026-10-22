@@ -1,19 +1,12 @@
 package ml.pluto7073.teatime.utils;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import ml.pluto7073.pdapi.item.AbstractCustomizableDrinkItem;
 import ml.pluto7073.pdapi.util.ColorUtil;
-import ml.pluto7073.pdapi.util.DrinkUtil;
-import ml.pluto7073.pdapi.addition.DrinkAddition;
 import ml.pluto7073.teatime.item.TTItems;
 import ml.pluto7073.teatime.teatypes.TeaType;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,12 +21,6 @@ public final class TeaTimeUtils {
 
     public static final Map<String, Item> DRYING_RESULTS = new HashMap<>();
     public static final int MAX_TIME_DRYING = 200;
-    public static final Codec<MobEffectInstance> MOB_EFFECT_CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(BuiltInRegistries.MOB_EFFECT.byNameCodec().fieldOf("effect")
-                                .forGetter(MobEffectInstance::getEffect),
-                            Codec.INT.fieldOf("duration").forGetter(MobEffectInstance::getDuration),
-                            Codec.INT.fieldOf("amplifier").forGetter(MobEffectInstance::getAmplifier))
-                    .apply(instance, MobEffectInstance::new));
 
     public static List<ItemStack> getRolledLeaves() {
         List<ItemStack> stacks = new ArrayList<>();
