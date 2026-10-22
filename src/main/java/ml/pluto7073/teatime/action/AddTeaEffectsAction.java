@@ -7,6 +7,7 @@ import ml.pluto7073.pdapi.addition.action.OnDrinkAction;
 import ml.pluto7073.pdapi.addition.action.OnDrinkSerializer;
 import ml.pluto7073.teatime.TeaTime;
 import ml.pluto7073.teatime.teatypes.TeaType;
+import ml.pluto7073.teatime.teatypes.TeaType.MobEffectTemplate;
 import ml.pluto7073.teatime.teatypes.TeaTypeManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -29,8 +30,8 @@ public class AddTeaEffectsAction implements OnDrinkAction {
 
     @Override
     public void onDrink(ItemStack stack, Level level, LivingEntity user) {
-        List<MobEffectInstance> list = level.getTeaTypeManager().get(type).getEffects(level);
-        list.forEach(user::addEffect);
+        List<MobEffectTemplate> list = level.getTeaTypeManager().get(type).getEffects(level);
+        list.stream().map(MobEffectTemplate::instantiate).forEach(user::addEffect);
     }
 
     @Override
